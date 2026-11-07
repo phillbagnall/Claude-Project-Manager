@@ -41,6 +41,8 @@ Paste [`templates/CLAUDE.md.snippet`](templates/CLAUDE.md.snippet) into each pro
 - **Cowork / non-repo work:** keep a local clone of `project-tracker-data` and ask Cowork to update `projects/<slug>.md` there and push.
 - **Ordinary claude.ai chats** don't read CLAUDE.md. Ask them to "write a PROJECT_STATUS.md update" and paste it in yourself.
 
+**Projects that are only on your PC (no GitHub repo yet):** open a Claude Code chat in the project's folder and paste the prompt from [`templates/ADD_PROJECT_PROMPT.md`](templates/ADD_PROJECT_PROMPT.md). It creates a private repo, writes the status file and CLAUDE.md section, and registers the project in `projects.json`. Afterwards you only add the repo to your token.
+
 To add a new project, say to a session: *"Set this repo up for my project tracker"*. It creates `PROJECT_STATUS.md` from [`templates/PROJECT_STATUS.md`](templates/PROJECT_STATUS.md). Then add the repo to `projects.json` and to your token's repository list.
 
 ## Status file format

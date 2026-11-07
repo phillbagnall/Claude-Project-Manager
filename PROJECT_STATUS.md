@@ -41,6 +41,10 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   - Ask any session to "add a note" and it appends a dated note to that project's Notes. It never edits or deletes existing notes unless you ask
   - Ordinary claude.ai chat (no repo): ask it to "write a PROJECT_STATUS.md for this chat in the dashboard format". On GitHub, add it to project-tracker-data as `projects/<name>.md`, then add `{ "id": "<name>", "repo": "phillbagnall/project-tracker-data", "path": "projects/<name>.md" }` to projects.json. To update it later, ask the chat for a fresh version and paste it over the old one
   - Cowork: same as a claude.ai chat, but Cowork can edit `projects/<name>.md` directly in a local clone of project-tracker-data and push it
+- 2026-11-07: Prompt for adding a PC project (no repo yet)
+  - Open a Claude Code chat in the project's folder on your PC and paste the prompt from `templates/ADD_PROJECT_PROMPT.md` (on GitHub: Claude-Project-Manager → templates → ADD_PROJECT_PROMPT.md → copy the text block)
+  - It names the repo, checks for huge files and secrets, creates a private GitHub repo, writes PROJECT_STATUS.md and the CLAUDE.md section, and adds the project to projects.json
+  - Your only job afterwards: add the new repo to your token, then tap ↻
 
 ## Decisions
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
@@ -48,6 +52,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Added a generic prompt for adding PC projects
 - 2026-11-07: Notes shown as separate collapsible cards
 - 2026-11-07: Claude can now add notes on request; added "new chat" note
 - 2026-11-07: Added notes (Add note box on each project page)
