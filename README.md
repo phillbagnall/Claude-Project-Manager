@@ -32,6 +32,8 @@ All of these steps work in the GitHub website on mobile.
    - When you add a new project repo later, edit the token to include that repo.
 4. **Open the dashboard** and enter `phillbagnall/project-tracker-data` and the token. Do this on each device you use; the token is stored per browser.
 
+5. **Optional: install it as an app on your phone.** Open the dashboard in Chrome, then tap ⋮ → **Add to home screen** → **Install**. It opens full-screen like an app and keeps your token, because the app and Chrome share the site's storage.
+
 ## Getting Claude to keep it updated
 
 Paste [`templates/CLAUDE.md.snippet`](templates/CLAUDE.md.snippet) into each project repo's `CLAUDE.md`, creating the file if needed. Then:

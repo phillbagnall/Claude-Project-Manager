@@ -52,6 +52,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Made the dashboard installable as a phone app (manifest, icons, service worker)
 - 2026-11-07: Added a generic prompt for adding PC projects
 - 2026-11-07: Notes shown as separate collapsible cards
 - 2026-11-07: Claude can now add notes on request; added "new chat" note
