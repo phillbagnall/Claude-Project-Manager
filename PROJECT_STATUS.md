@@ -12,7 +12,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 ## Next steps
 - [ ] Merge `claude/project-manager-dashboard-k76ee7` into `main`
 - [ ] Make this repo public, then Settings → Pages → Source: GitHub Actions
-- [ ] Create private repo `project-tracker-data` with `projects.json` (include this repo)
+- [x] Create private repo `project-tracker-data` with `projects.json` (include this repo)
 - [ ] Create fine-grained token (Contents: read/write on selected repos) and connect the dashboard
 - [ ] Add `templates/CLAUDE.md.snippet` to 1–2 real project repos and to `~/.claude/CLAUDE.md` on desktop
 - [ ] Set up Cowork with a local clone of `project-tracker-data`
