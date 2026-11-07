@@ -103,6 +103,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Collapsible project cards on the overview (Collapse all / Expand all)
 - 2026-11-07: Added global PC instruction (templates/GLOBAL_CLAUDE.md + note)
 - 2026-11-07: Full add-project prompt in Notes with a Copy button
 - 2026-11-07: Made the dashboard installable as a phone app (manifest, icons, service worker)

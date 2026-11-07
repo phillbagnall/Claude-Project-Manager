@@ -24,10 +24,12 @@ interface ViewPrefs {
   sort: Sort;
   phase: string;
   hideInactive: boolean;
+  /** Ids of project cards collapsed on the overview (per device). */
+  collapsed: string[];
 }
 const PREFS_KEY = 'cpm.prefs.v1';
 function loadPrefs(): ViewPrefs {
-  const d: ViewPrefs = { sort: 'priority', phase: 'All', hideInactive: true };
+  const d: ViewPrefs = { sort: 'priority', phase: 'All', hideInactive: true, collapsed: [] };
   try {
     return { ...d, ...JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}') };
   } catch {
@@ -134,6 +136,18 @@ export function App() {
             <button role="tab" aria-selected={route.view === 'actions'} onClick={() => go('/actions')}>
               Open actions <span className="count">{openCount}</span>
             </button>
+            {route.view === 'overview' && (
+              <button
+                className="link small tabs-action"
+                onClick={() => {
+                  const ids = visible.map((p) => p.entry.id);
+                  const allCollapsed = ids.every((id) => prefs.collapsed.includes(id));
+                  setPrefs({ ...prefs, collapsed: allCollapsed ? prefs.collapsed.filter((id) => !ids.includes(id)) : [...new Set([...prefs.collapsed, ...ids])] });
+                }}
+              >
+                {visible.length > 0 && visible.every((p) => prefs.collapsed.includes(p.entry.id)) ? 'Expand all' : 'Collapse all'}
+              </button>
+            )}
           </nav>
         )}
 
@@ -169,7 +183,19 @@ export function App() {
             )}
             <div className="grid">
               {visible.map((p) => (
-                <ProjectCard key={p.entry.id} project={p} onOpen={() => go(`/p/${encodeURIComponent(p.entry.id)}`)} onToggle={(s, d) => toggleStep(p.entry.id, s, d)} />
+                <ProjectCard
+                  key={p.entry.id}
+                  project={p}
+                  onOpen={() => go(`/p/${encodeURIComponent(p.entry.id)}`)}
+                  onToggle={(s, d) => toggleStep(p.entry.id, s, d)}
+                  collapsed={prefs.collapsed.includes(p.entry.id)}
+                  onToggleCollapsed={() =>
+                    setPrefs((pr) => ({
+                      ...pr,
+                      collapsed: pr.collapsed.includes(p.entry.id) ? pr.collapsed.filter((id) => id !== p.entry.id) : [...pr.collapsed, p.entry.id],
+                    }))
+                  }
+                />
               ))}
             </div>
           </>
