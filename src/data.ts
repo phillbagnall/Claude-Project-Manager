@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEMO_FILES, DEMO_REGISTRY } from './demo';
 import { GitHubError, getFile, putFile } from './github';
-import { parseStatus, setStep, type ParsedStatus, type Step } from './status';
+import { addNote as addNoteToText, parseStatus, setStep, today, type ParsedStatus, type Step } from './status';
 
 export interface RegistryEntry {
   /** Unique slug. */
@@ -213,5 +213,62 @@ export function useProjects(settings: Settings) {
     [settings, patch],
   );
 
-  return { projects, registryError, authError, refreshing, refresh, toggleStep };
+  /**
+   * Apply a text transform to a project's file and commit it, queued behind other
+   * writes to the same file; on a sha conflict, re-fetch and re-apply once.
+   * Resolves when saved; rejects with a readable error.
+   */
+  const editFile = useCallback(
+    (id: string, transform: (text: string) => string, message: string): Promise<void> => {
+      if (settings.demo) {
+        const cur = latest.current.find((p) => p.entry.id === id);
+        if (cur?.raw) {
+          const next = transform(cur.raw);
+          patch(id, { raw: next, status: derive(next, cur.pending) });
+        }
+        return Promise.resolve();
+      }
+      const run = async () => {
+        const p = latest.current.find((x) => x.entry.id === id);
+        if (!p?.raw || !p.sha) throw new Error('Project not loaded yet.');
+        const { entry } = p;
+        const file = projectPath(entry);
+        patch(id, { saving: true });
+        try {
+          let next = transform(p.raw);
+          let sha: string;
+          try {
+            sha = await putFile(settings.token, entry.repo, file, next, p.sha, message, entry.branch);
+          } catch (e) {
+            if (!(e instanceof GitHubError && e.isConflict)) throw e;
+            const fresh = await getFile(settings.token, entry.repo, file, entry.branch);
+            next = transform(fresh.text);
+            sha = await putFile(settings.token, entry.repo, file, next, fresh.sha, message, entry.branch);
+          }
+          setProjects((ps) =>
+            ps.map((x) =>
+              x.entry.id === id ? { ...x, raw: next, sha, saving: false, saveError: undefined, status: derive(next, x.pending) } : x,
+            ),
+          );
+        } catch (e) {
+          if (e instanceof GitHubError && e.isAuth) setAuthError(true);
+          patch(id, { saving: false });
+          throw new Error(`Couldn't save: ${errMsg(e)}`);
+        }
+      };
+      const prev = queues.current.get(id) ?? Promise.resolve();
+      const job = prev.then(run, run);
+      queues.current.set(id, job.catch(() => undefined));
+      return job;
+    },
+    [settings, patch],
+  );
+
+  const addNote = useCallback(
+    (id: string, note: string) =>
+      editFile(id, (text) => addNoteToText(text, note, today()), `dashboard: note "${note.split('\n')[0].trim().slice(0, 50)}"`),
+    [editFile],
+  );
+
+  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote };
 }

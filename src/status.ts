@@ -35,6 +35,8 @@ export interface ParsedStatus {
   summary: string;
   steps: Step[];
   keyInfo: string[];
+  /** Raw markdown of the user's `## Notes` section. */
+  notes: string;
   decisions: string[];
   log: string[];
   /** Every section in file order, for the detail view. */
@@ -120,7 +122,8 @@ export function parseStatus(md: string): ParsedStatus {
     meta,
     summary: find('summary', 'overview'),
     steps,
-    keyInfo: bullets(find('key info', 'key information', 'notes')),
+    keyInfo: bullets(find('key info', 'key information')),
+    notes: find('notes'),
     decisions: bullets(find('decisions')),
     log: bullets(find('log', 'changelog', 'history')),
     sections,
@@ -156,4 +159,44 @@ export function daysSince(date: string | undefined, now = new Date()): number | 
 
 export function isBlocked(meta: StatusMeta): boolean {
   return meta.blocked === true || meta.blocked === 'true' || meta.blocked === 'yes';
+}
+
+const SECTIONS_AFTER_NOTES = ['decisions', 'log', 'changelog', 'history'];
+
+/**
+ * Append a dated note to the `## Notes` section, creating the section (before
+ * Decisions/Log, or at the end) if needed. Extra lines become indented sub-bullets.
+ */
+export function addNote(md: string, note: string, date: string): string {
+  const eol = md.includes('\r\n') ? '\r\n' : '\n';
+  const lines = md.split(/\r?\n/);
+  const [first, ...rest] = note.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (!first) return md;
+  const entry = [`- ${date}: ${first}`, ...rest.map((l) => `  - ${l.replace(/^[-*+]\s+/, '')}`)];
+
+  const headingAt = (i: number) => lines[i]?.match(HEADING)?.[1];
+  const notesIdx = lines.findIndex((_, i) => normalise(headingAt(i) ?? '') === 'notes');
+  if (notesIdx === -1) {
+    const insertAt = lines.findIndex((_, i) => SECTIONS_AFTER_NOTES.includes(normalise(headingAt(i) ?? '-')));
+    if (insertAt === -1) {
+      while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+      lines.push('', '## Notes', ...entry, '');
+    } else {
+      lines.splice(insertAt, 0, '## Notes', ...entry, '');
+    }
+    return lines.join(eol);
+  }
+  // Append at the end of the Notes section (before the next heading), skipping trailing blank lines.
+  let end = notesIdx + 1;
+  while (end < lines.length && !headingAt(end)) end++;
+  let insert = end;
+  while (insert > notesIdx + 1 && lines[insert - 1].trim() === '') insert--;
+  lines.splice(insert, 0, ...entry);
+  return lines.join(eol);
+}
+
+/** Local date as YYYY-MM-DD. */
+export function today(now = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
 }

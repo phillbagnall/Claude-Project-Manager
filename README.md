@@ -59,11 +59,14 @@ links: [https://github.com/phillbagnall/recipe-app]
 - [ ] Wire up login
 - [x] Database schema
 ## Key info
+## Notes
 ## Decisions
 ## Log
 ```
 
 Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
+
+`## Notes` is yours: the **Add note** box on a project's page appends a dated bullet there (extra lines become sub-points) and commits it. Claude sessions are told to read your notes but never change them.
 
 ## Custom domain (optional)
 

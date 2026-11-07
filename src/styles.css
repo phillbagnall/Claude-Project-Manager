@@ -238,3 +238,11 @@ p.error.panel { background: var(--danger-bg); border-color: transparent; }
 details summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; }
 main > .setup { margin-bottom: 16px; }
+
+.note-form { display: grid; gap: 8px; margin-top: 8px; }
+.note-form textarea {
+  width: 100%; resize: vertical; min-height: 72px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+  padding: 0.6em 0.75em; font: inherit; color: inherit;
+}
+.note-form .row { align-items: center; }

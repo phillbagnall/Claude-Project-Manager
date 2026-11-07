@@ -36,28 +36,38 @@ export function shortUrl(url: string): string {
   }
 }
 
-/** Block-level rendering for a section body: paragraphs and (non-checkbox) bullet lists. */
+/** Block-level rendering for a section body: paragraphs and (non-checkbox) bullet lists, one level of nesting. */
 export function Blocks({ body }: { body: string }) {
+  type Item = { text: string; children: string[] };
   const blocks: ReactNode[] = [];
   let para: string[] = [];
-  let list: string[] = [];
+  let list: Item[] = [];
   const flush = () => {
     if (para.length) blocks.push(<p key={blocks.length}><Inline text={para.join(' ')} /></p>);
     if (list.length)
       blocks.push(
         <ul key={blocks.length}>
-          {list.map((l, i) => <li key={i}><Inline text={l} /></li>)}
+          {list.map((item, i) => (
+            <li key={i}>
+              <Inline text={item.text} />
+              {item.children.length > 0 && (
+                <ul>{item.children.map((c, j) => <li key={j}><Inline text={c} /></li>)}</ul>
+              )}
+            </li>
+          ))}
         </ul>,
       );
     para = [];
     list = [];
   };
   for (const line of body.split('\n')) {
-    const b = line.match(/^\s*[-*+]\s+(.*)$/);
+    const b = line.match(/^(\s*)[-*+]\s+(.*)$/);
     if (!line.trim()) flush();
     else if (b) {
       if (para.length) flush();
-      list.push(b[1]);
+      const nested = b[1].length >= 2 && list.length > 0;
+      if (nested) list[list.length - 1].children.push(b[2]);
+      else list.push({ text: b[2], children: [] });
     } else {
       if (list.length) flush();
       para.push(line.trim());

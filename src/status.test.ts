@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { daysSince, parseStatus, setStep } from './status';
+import { addNote, daysSince, parseStatus, setStep, today } from './status';
 
 const SAMPLE = `---
 name: Recipe App
@@ -104,5 +104,31 @@ describe('daysSince', () => {
     expect(daysSince('2026-11-01', new Date('2026-11-07T12:00:00Z'))).toBe(6);
     expect(daysSince(undefined)).toBeNull();
     expect(daysSince('nonsense')).toBeNull();
+  });
+});
+
+describe('addNote', () => {
+  it('creates a Notes section before Decisions', () => {
+    const out = addNote(SAMPLE, 'Remember the API key rotation', '2026-11-08');
+    expect(out).toContain('## Notes\n- 2026-11-08: Remember the API key rotation\n\n## Decisions');
+    expect(parseStatus(out).notes).toBe('- 2026-11-08: Remember the API key rotation');
+  });
+
+  it('appends to an existing Notes section and keeps other sections intact', () => {
+    const once = addNote(SAMPLE, 'First', '2026-11-08');
+    const twice = addNote(once, 'Second\nstep one\n- step two', '2026-11-09');
+    expect(parseStatus(twice).notes).toBe('- 2026-11-08: First\n- 2026-11-09: Second\n  - step one\n  - step two');
+    expect(parseStatus(twice).decisions).toEqual(['2026-11-02: Chose Supabase']);
+    expect(parseStatus(twice).steps).toHaveLength(3);
+  });
+
+  it('adds Notes at the end when there is no Decisions/Log section', () => {
+    const out = addNote('---\nname: X\n---\n## Summary\nHi\n\n', 'A note', '2026-11-08');
+    expect(out).toBe('---\nname: X\n---\n## Summary\nHi\n\n## Notes\n- 2026-11-08: A note\n');
+  });
+
+  it('ignores empty notes and formats dates', () => {
+    expect(addNote(SAMPLE, '   \n ', '2026-11-08')).toBe(SAMPLE);
+    expect(today(new Date(2026, 0, 5))).toBe('2026-01-05');
   });
 });
