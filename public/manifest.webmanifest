@@ -2,7 +2,7 @@
   "name": "Project Manager",
   "short_name": "Projects",
   "description": "Overview and next steps for your Claude projects",
-  "id": "./",
+  "id": "./?app=project-manager",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
