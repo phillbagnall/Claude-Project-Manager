@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 
 const SAFE_URL = /^(https?:|mailto:)/i;
 // Order matters: code first so its contents aren't formatted.
@@ -60,7 +60,22 @@ export function Blocks({ body }: { body: string }) {
     para = [];
     list = [];
   };
+  let code: string[] | null = null;
   for (const line of body.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      if (code === null) {
+        flush();
+        code = [];
+      } else {
+        blocks.push(<CodeBlock key={blocks.length} text={code.join('\n')} />);
+        code = null;
+      }
+      continue;
+    }
+    if (code !== null) {
+      code.push(line);
+      continue;
+    }
     const b = line.match(/^(\s*)[-*+]\s+(.*)$/);
     if (!line.trim()) flush();
     else if (b) {
@@ -73,6 +88,33 @@ export function Blocks({ body }: { body: string }) {
       para.push(line.trim());
     }
   }
+  if (code !== null) blocks.push(<CodeBlock key={blocks.length} text={code.join('\n')} />);
   flush();
   return <>{blocks}</>;
+}
+
+/** A code/prompt block with a Copy button. */
+export function CodeBlock({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Older browsers: copy via a temporary textarea.
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="code-block">
+      <button type="button" className="copy" onClick={copy}>{copied ? 'Copied ✓' : 'Copy'}</button>
+      <pre>{text}</pre>
+    </div>
+  );
 }

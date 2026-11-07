@@ -42,9 +42,44 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   - Ordinary claude.ai chat (no repo): ask it to "write a PROJECT_STATUS.md for this chat in the dashboard format". On GitHub, add it to project-tracker-data as `projects/<name>.md`, then add `{ "id": "<name>", "repo": "phillbagnall/project-tracker-data", "path": "projects/<name>.md" }` to projects.json. To update it later, ask the chat for a fresh version and paste it over the old one
   - Cowork: same as a claude.ai chat, but Cowork can edit `projects/<name>.md` directly in a local clone of project-tracker-data and push it
 - 2026-11-07: Prompt for adding a PC project (no repo yet)
-  - Open a Claude Code chat in the project's folder on your PC and paste the prompt from `templates/ADD_PROJECT_PROMPT.md` (on GitHub: Claude-Project-Manager → templates → ADD_PROJECT_PROMPT.md → copy the text block)
-  - It names the repo, checks for huge files and secrets, creates a private GitHub repo, writes PROJECT_STATUS.md and the CLAUDE.md section, and adds the project to projects.json
-  - Your only job afterwards: add the new repo to your token, then tap ↻
+  - Open a Claude Code chat in the project's folder on your PC, tap Copy below and paste it in. Afterwards: add the new repo to your token, then tap ↻
+  - Same text as `templates/ADD_PROJECT_PROMPT.md`; if one changes, update the other
+  ```text
+  Please add this project to my project dashboard (https://github.com/phillbagnall/Claude-Project-Manager). Work through these steps in order, and stop to ask me where it says so.
+
+  1. Name: suggest a GitHub repo name from this folder's name (spaces to "-", no symbols; e.g. "AE - Walkthrough" -> "AE-Walkthrough"). Read the project and tell me in one line what you think it is. Ask me to confirm both.
+
+  2. Safety check before committing anything: list (a) files over 100 MB (GitHub rejects them; renders, footage and other media are common culprits), (b) anything that looks like a secret (.env files, keys, tokens, passwords), and (c) generated output (builds, caches, renders, node_modules and similar). Propose a .gitignore that leaves these out and ask me to OK it. Never commit secrets.
+
+  3. Git: if this folder isn't a git repo yet, run git init. Commit the project. If it already is a repo with a remote, tell me and use that instead of creating a new one.
+
+  4. GitHub: create a PRIVATE repo phillbagnall/<name> and push. If the gh CLI is installed and logged in, use: gh repo create <name> --private --source . --push. If not, ask me to create an empty private repo with that exact name at https://github.com/new (no README), then add it as the remote and push.
+
+  5. Status file: create PROJECT_STATUS.md in the repo root using this format (frontmatter + sections). Fill it in from what's actually in the project: a 2-4 sentence summary, concrete next steps as checkboxes, and key info (how to run it, where things live; never secrets). Set updated to today, phase to your best guess (Idea | Planning | Building | Testing | Shipped | Paused), priority medium unless I say otherwise, and links to the repo URL.
+
+  ---
+  name: <Project name>
+  phase: Building
+  priority: medium
+  updated: YYYY-MM-DD
+  blocked: false
+  links: [https://github.com/phillbagnall/<name>]
+  ---
+  ## Summary
+  ## Next steps
+  - [ ] ...
+  ## Key info
+  ## Notes
+  ## Decisions
+  ## Log
+  - YYYY-MM-DD: Added to the project dashboard
+
+  6. CLAUDE.md: download https://raw.githubusercontent.com/phillbagnall/Claude-Project-Manager/main/templates/CLAUDE.md.snippet and append it to CLAUDE.md in the repo root (create the file if it doesn't exist; keep anything already there). Commit both files and push.
+
+  7. Register it: add {"id": "<name in lowercase>", "repo": "phillbagnall/<name>"} to the "projects" list in projects.json in my private repo phillbagnall/project-tracker-data. Keep the existing entries and keep the JSON valid. Use a temporary shallow clone (edit, commit, push, then delete the clone) or the gh API. If you can't get access, show me the exact line to add on GitHub myself.
+
+  8. Finish by reminding me to give my dashboard token access to the new repo (https://github.com/settings/personal-access-tokens -> my token -> Edit -> Repository access -> add the repo -> Update) and then tap refresh on the dashboard. Give me the repo URL.
+  ```
 
 ## Decisions
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
@@ -52,6 +87,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Full add-project prompt in Notes with a Copy button
 - 2026-11-07: Made the dashboard installable as a phone app (manifest, icons, service worker)
 - 2026-11-07: Added a generic prompt for adding PC projects
 - 2026-11-07: Notes shown as separate collapsible cards

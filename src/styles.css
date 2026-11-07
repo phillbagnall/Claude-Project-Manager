@@ -266,3 +266,15 @@ main > .setup { margin-bottom: 16px; }
 .note-body { padding: 4px 12px 10px; font-size: 14.5px; }
 .note-body ul { padding-left: 1.1em; }
 .note-body li { margin: 0.35em 0; }
+
+.code-block { position: relative; margin: 8px 0; }
+.code-block pre {
+  margin: 0; padding: 44px 12px 12px; max-height: 320px; overflow: auto;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+  font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.code-block .copy {
+  position: absolute; top: 6px; right: 6px; min-height: 32px; padding: 0.25em 0.8em;
+  font-size: 13px; font-weight: 600; background: var(--accent); color: var(--accent-ink); border-color: transparent;
+}

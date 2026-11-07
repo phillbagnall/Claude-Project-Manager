@@ -6,3 +6,4 @@ A static React + TypeScript (Vite) dashboard that reads `PROJECT_STATUS.md` file
 - Never commit project data or tokens to this repo. It's public, and the data lives in private repos.
 - Don't render raw HTML from status files. Use `src/markdown.tsx` (`Inline` / `Blocks`) instead.
 - If you change the status-file format, update `src/status.ts`, its tests, `templates/`, the format section in README.md and `templates/CLAUDE.md.snippet` together.
+- `templates/ADD_PROJECT_PROMPT.md` is also copied into a note in `PROJECT_STATUS.md` ("Prompt for adding a PC project"); keep the two identical.

@@ -144,3 +144,22 @@ describe('splitNotes', () => {
     ]);
   });
 });
+
+describe('fenced code blocks', () => {
+  const md = '---\nname: X\n---\n## Notes\n- 2026-11-07: Prompt\n  ```text\n  ## Summary\n  - [ ] not a step\n  ```\n## Next steps\n- [ ] real step\n';
+  it('ignores headings and checkboxes inside fences', () => {
+    const s = parseStatus(md);
+    expect(s.sections.map((x) => x.title)).toEqual(['Notes', 'Next steps']);
+    expect(s.steps.map((x) => x.text)).toEqual(['real step']);
+  });
+  it('setStep and addNote skip fenced lines', () => {
+    expect(setStep(md, 'not a step', true)).toBeNull();
+    const out = addNote(md, 'Another', '2026-11-08');
+    expect(out).toContain('  ```\n- 2026-11-08: Another\n## Next steps');
+  });
+  it('splitNotes keeps the fence in the note body', () => {
+    const n = splitNotes(parseStatus(md).notes);
+    expect(n).toHaveLength(1);
+    expect(n[0].body).toBe('```text\n## Summary\n- [ ] not a step\n```');
+  });
+});

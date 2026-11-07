@@ -49,6 +49,20 @@ const CHECKBOX = /^(\s*[-*+]\s+\[)([ xX])(\]\s+)(.*)$/;
 const BULLET = /^\s*[-*+]\s+(.*)$/;
 const HEADING = /^##\s+(.+?)\s*#*\s*$/;
 
+const FENCE = /^\s*(```|~~~)/;
+
+/** For each line, whether it is part of a fenced code block (fence lines included). */
+function fenceMask(lines: string[]): boolean[] {
+  let inside = false;
+  return lines.map((l) => {
+    if (FENCE.test(l)) {
+      inside = !inside;
+      return true;
+    }
+    return inside;
+  });
+}
+
 function splitFrontmatter(md: string): { yaml: string | null; bodyStart: number; lines: string[] } {
   const lines = md.replace(/\r\n?/g, '\n').split('\n');
   if (lines[0]?.trim() === '---') {
@@ -99,9 +113,11 @@ export function parseStatus(md: string): ParsedStatus {
   let current: { title: string; start: number } | null = null;
   const bodyLines: Record<string, string[]> = {};
 
+  const fenced = fenceMask(lines);
   for (let i = bodyStart; i < lines.length; i++) {
     const line = lines[i];
-    const h = line.match(HEADING);
+    // Headings and checkboxes inside code blocks (e.g. a prompt in a note) are just text.
+    const h = fenced[i] ? null : line.match(HEADING);
     if (h) {
       current = { title: h[1], start: i };
       sections.push({ title: h[1], body: '' });
@@ -110,7 +126,7 @@ export function parseStatus(md: string): ParsedStatus {
     }
     if (!current) continue;
     bodyLines[sections.length - 1].push(line);
-    const cb = line.match(CHECKBOX);
+    const cb = fenced[i] ? null : line.match(CHECKBOX);
     if (cb) steps.push({ text: cb[4].trim(), done: cb[2] !== ' ', line: i, section: current.title });
   }
   sections.forEach((s, idx) => (s.body = bodyLines[idx].join('\n').trim()));
@@ -139,7 +155,8 @@ export function parseStatus(md: string): ParsedStatus {
 export function setStep(md: string, text: string, done: boolean, hintLine?: number): string | null {
   const eol = md.includes('\r\n') ? '\r\n' : '\n';
   const lines = md.split(/\r?\n/);
-  const matches = (i: number) => lines[i]?.match(CHECKBOX)?.[4].trim() === text;
+  const fenced = fenceMask(lines);
+  const matches = (i: number) => !fenced[i] && lines[i]?.match(CHECKBOX)?.[4].trim() === text;
 
   let idx = -1;
   if (hintLine !== undefined && matches(hintLine)) idx = hintLine;
@@ -174,7 +191,8 @@ export function addNote(md: string, note: string, date: string): string {
   if (!first) return md;
   const entry = [`- ${date}: ${first}`, ...rest.map((l) => `  - ${l.replace(/^[-*+]\s+/, '')}`)];
 
-  const headingAt = (i: number) => lines[i]?.match(HEADING)?.[1];
+  const fenced = fenceMask(lines);
+  const headingAt = (i: number) => (fenced[i] ? undefined : lines[i]?.match(HEADING)?.[1]);
   const notesIdx = lines.findIndex((_, i) => normalise(headingAt(i) ?? '') === 'notes');
   if (notesIdx === -1) {
     const insertAt = lines.findIndex((_, i) => SECTIONS_AFTER_NOTES.includes(normalise(headingAt(i) ?? '-')));
