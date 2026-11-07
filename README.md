@@ -39,7 +39,7 @@ All of these steps work in the GitHub website on mobile.
 Paste [`templates/CLAUDE.md.snippet`](templates/CLAUDE.md.snippet) into each project repo's `CLAUDE.md`, creating the file if needed. Then:
 
 - **Cloud sessions** (claude.ai/code, the mobile app) clone the repo, so its `CLAUDE.md` loads automatically. This is the part that works everywhere.
-- **Claude Code on desktop:** also add the snippet to `~/.claude/CLAUDE.md` so it applies in every local repo. Cloud sessions don't see this global file.
+- **Claude Code on desktop:** paste [`templates/GLOBAL_CLAUDE.md`](templates/GLOBAL_CLAUDE.md) into `~/.claude/CLAUDE.md` (Windows: `C:\Users\<you>\.claude\CLAUDE.md`). Every local chat then keeps tracked projects updated and offers to add untracked ones. Cloud sessions don't see this global file.
 - **Cowork / non-repo work:** keep a local clone of `project-tracker-data` and ask Cowork to update `projects/<slug>.md` there and push.
 - **Ordinary claude.ai chats** don't read CLAUDE.md. Ask them to "write a PROJECT_STATUS.md update" and paste it in yourself.
 

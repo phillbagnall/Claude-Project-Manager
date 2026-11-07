@@ -15,7 +15,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - [x] Create private repo `project-tracker-data` with `projects.json` (include this repo)
 - [x] Create fine-grained token (Contents: read/write on selected repos) and connect the dashboard
 - [x] Add piano-trainer, VideoTagger and Financial-Dashboard to the token's repository access
-- [ ] Add `templates/CLAUDE.md.snippet` to `~/.claude/CLAUDE.md` on desktop
+- [ ] Paste the "Global instruction for Claude Code on your PC" note into `~/.claude/CLAUDE.md` on the PC
 - [x] Add status files and the CLAUDE.md snippet to piano-trainer, VideoTagger and Financial-Dashboard
 - [ ] Set up Cowork with a local clone of `project-tracker-data`
 - [ ] Optional: point custom domain at GitHub Pages
@@ -80,6 +80,22 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 
   8. Finish by reminding me to give my dashboard token access to the new repo (https://github.com/settings/personal-access-tokens -> my token -> Edit -> Repository access -> add the repo -> Update) and then tap refresh on the dashboard. Give me the repo URL.
   ```
+- 2026-11-07: Global instruction for Claude Code on your PC
+  - Makes every new Claude Code chat on your PC offer to add an untracked project to the dashboard (answer yes, not now, or never)
+  - Tap Copy and paste it at the end of `C:\Users\<you>\.claude\CLAUDE.md` (create the file if it doesn't exist). Only Claude Code on that PC reads it
+  - Same text as `templates/GLOBAL_CLAUDE.md`; if one changes, update the other
+  ```text
+  ## Project dashboard
+
+  I track my projects on a dashboard (https://github.com/phillbagnall/Claude-Project-Manager) that reads PROJECT_STATUS.md from the root of each project's GitHub repo.
+
+  - If this project has a PROJECT_STATUS.md: keep it up to date as its CLAUDE.md describes. If its CLAUDE.md has no "Project status file (dashboard)" section, follow https://raw.githubusercontent.com/phillbagnall/Claude-Project-Manager/main/templates/CLAUDE.md.snippet instead.
+  - If it doesn't, and this folder is a real project (not my home folder, Downloads, Desktop or a temporary folder), ask me once near the start of the session: "This project isn't on your dashboard yet. Want me to add it?"
+    - Yes: follow the steps in https://raw.githubusercontent.com/phillbagnall/Claude-Project-Manager/main/templates/ADD_PROJECT_PROMPT.md (the text block in that file).
+    - Not now: don't ask again this session.
+    - Never: create an empty file named .no-dashboard in the project root and commit it. Never ask in a folder that has that file.
+  - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD: text" (extra lines as indented sub-points), then commit and push.
+  ```
 
 ## Decisions
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
@@ -87,6 +103,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Added global PC instruction (templates/GLOBAL_CLAUDE.md + note)
 - 2026-11-07: Full add-project prompt in Notes with a Copy button
 - 2026-11-07: Made the dashboard installable as a phone app (manifest, icons, service worker)
 - 2026-11-07: Added a generic prompt for adding PC projects
