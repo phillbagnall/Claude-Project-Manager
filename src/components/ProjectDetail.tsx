@@ -5,6 +5,7 @@ import type { Step } from '../status';
 import { Blocked, PhaseBadge, PriorityDot, Progress, Updated } from './Badges';
 import { displayName } from './ProjectCard';
 import { NoteForm } from './NoteForm';
+import { NoteList } from './NoteList';
 import { StepItem } from './StepItem';
 
 const SPECIAL = new Set(['summary', 'overview']);
@@ -90,7 +91,7 @@ export function ProjectDetail({
       {status && (
         <section className="panel">
           <h2>Notes</h2>
-          {notesBody ? <Blocks body={notesBody} /> : <p className="muted small">Your own notes. Claude sessions read them but leave them alone.</p>}
+          {notesBody ? <NoteList body={notesBody} /> : <p className="muted small">Your own notes. Claude sessions read them but leave them alone.</p>}
           <NoteForm onAdd={onAddNote} />
         </section>
       )}

@@ -132,3 +132,15 @@ describe('addNote', () => {
     expect(today(new Date(2026, 0, 5))).toBe('2026-01-05');
   });
 });
+
+import { splitNotes } from './components/NoteList';
+describe('splitNotes', () => {
+  it('makes one note per top-level bullet with date, title and body', () => {
+    const notes = splitNotes('- 2026-11-07: How to add\n  - Step one\n  - Step two\n- Plain note\n- 2026-11-08 - Dashed date');
+    expect(notes).toEqual([
+      { date: '2026-11-07', title: 'How to add', body: '- Step one\n- Step two' },
+      { date: undefined, title: 'Plain note', body: '' },
+      { date: '2026-11-08', title: 'Dashed date', body: '' },
+    ]);
+  });
+});

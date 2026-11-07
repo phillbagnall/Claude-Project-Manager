@@ -48,6 +48,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Notes shown as separate collapsible cards
 - 2026-11-07: Claude can now add notes on request; added "new chat" note
 - 2026-11-07: Added notes (Add note box on each project page)
 - 2026-11-07: Live on Pages; connected piano-trainer, VideoTagger and Financial-Dashboard
