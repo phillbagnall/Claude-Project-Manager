@@ -1,20 +1,22 @@
 ---
 name: Claude Project Manager
-phase: Building
+phase: Testing
 priority: high
 updated: 2026-11-07
 blocked: false
 links: [https://github.com/phillbagnall/Claude-Project-Manager]
 ---
 ## Summary
-Dashboard that shows every Claude project's summary, phase and next steps from `PROJECT_STATUS.md` files, with checkboxes that sync back to GitHub. The code is built and tested; it now needs the one-time GitHub setup and some real projects connected.
+Dashboard that shows every Claude project's summary, phase and next steps from `PROJECT_STATUS.md` files, with checkboxes that sync back to GitHub. It's live on GitHub Pages and tracking piano-trainer, VideoTagger and Financial-Dasboard. What's left is desktop setup (global CLAUDE.md, Cowork).
 
 ## Next steps
-- [ ] Merge `claude/project-manager-dashboard-k76ee7` into `main`
-- [ ] Make this repo public, then Settings → Pages → Source: GitHub Actions
+- [x] Merge `claude/project-manager-dashboard-k76ee7` into `main`
+- [x] Make this repo public, then Settings → Pages → Source: GitHub Actions
 - [x] Create private repo `project-tracker-data` with `projects.json` (include this repo)
 - [x] Create fine-grained token (Contents: read/write on selected repos) and connect the dashboard
-- [ ] Add `templates/CLAUDE.md.snippet` to 1–2 real project repos and to `~/.claude/CLAUDE.md` on desktop
+- [ ] Add piano-trainer, VideoTagger and Financial-Dasboard to the token's repository access
+- [ ] Add `templates/CLAUDE.md.snippet` to `~/.claude/CLAUDE.md` on desktop
+- [x] Add status files and the CLAUDE.md snippet to piano-trainer, VideoTagger and Financial-Dasboard
 - [ ] Set up Cowork with a local clone of `project-tracker-data`
 - [ ] Optional: point custom domain at GitHub Pages
 - [x] Build dashboard (overview, open actions, project detail, tick write-back)
@@ -31,4 +33,5 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-07: Live on Pages; connected piano-trainer, VideoTagger and Financial-Dasboard
 - 2026-11-07: Planned on mobile, built and tested v1 in a cloud session
