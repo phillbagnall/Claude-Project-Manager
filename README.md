@@ -1,0 +1,86 @@
+# Claude Project Manager
+
+A dashboard for all your Claude projects. Each project has a short status file, `PROJECT_STATUS.md`, with a summary, next steps as checkboxes, key info, decisions and a log. Claude sessions keep that file up to date, and the dashboard shows every project in one place on phone or desktop. When you tick a box on the dashboard, it's committed back to the repo, so the next Claude session knows the step is done.
+
+**Public code, private data.** This repo holds only the dashboard code and is served free on GitHub Pages. Your project information stays in private repos and is read in your browser through the GitHub API, using a token that's saved only in that browser. A visitor without the token sees an empty sign-in screen.
+
+```
+ project repo A ── PROJECT_STATUS.md ─┐
+ project repo B ── PROJECT_STATUS.md ─┤   (private)      GitHub API     ┌──────────────┐
+ project-tracker-data (private)       ├────────────────────────────────▶│  dashboard   │
+   ├─ projects.json  (list of above)  │   read + tick-back via token    │ (GitHub Pages)│
+   └─ projects/<slug>.md  (Cowork)   ─┘                                 └──────────────┘
+```
+
+## Setup (one-time)
+
+All of these steps work in the GitHub website on mobile.
+
+1. **Turn on Pages for this repo.** Go to *Settings → Pages → Build and deployment → Source: GitHub Actions*. The repo must be **public** to use Pages for free. Pushes to `main` then deploy to `https://phillbagnall.github.io/Claude-Project-Manager/`. To see the dashboard before connecting anything, open it and tap **Try with demo data**.
+2. **Create the private data repo.** Make a new repository called `project-tracker-data` and set it to **Private**. Add a `projects.json` file (example in [`templates/projects.json`](templates/projects.json)):
+   ```json
+   { "projects": [
+       { "id": "recipe-app", "repo": "phillbagnall/recipe-app" },
+       { "id": "garden", "repo": "phillbagnall/project-tracker-data", "path": "projects/garden.md" }
+   ] }
+   ```
+   Each entry needs `repo`. The optional fields are `path` (default `PROJECT_STATUS.md`), `branch` (default: the repo's default branch), `id` and `name`. Projects with no repo of their own, such as Cowork work, live as `projects/<slug>.md` in this data repo.
+3. **Create a token.** Use a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new):
+   - Repository access: **Only select repositories**. Choose `project-tracker-data` and every project repo you track.
+   - Permissions: **Contents → Read and write**. Nothing else is needed.
+   - Expiry: up to a year. When it expires, the dashboard asks for a new one.
+   - When you add a new project repo later, edit the token to include that repo.
+4. **Open the dashboard** and enter `phillbagnall/project-tracker-data` and the token. Do this on each device you use; the token is stored per browser.
+
+## Getting Claude to keep it updated
+
+Paste [`templates/CLAUDE.md.snippet`](templates/CLAUDE.md.snippet) into each project repo's `CLAUDE.md`, creating the file if needed. Then:
+
+- **Cloud sessions** (claude.ai/code, the mobile app) clone the repo, so its `CLAUDE.md` loads automatically. This is the part that works everywhere.
+- **Claude Code on desktop:** also add the snippet to `~/.claude/CLAUDE.md` so it applies in every local repo. Cloud sessions don't see this global file.
+- **Cowork / non-repo work:** keep a local clone of `project-tracker-data` and ask Cowork to update `projects/<slug>.md` there and push.
+- **Ordinary claude.ai chats** don't read CLAUDE.md. Ask them to "write a PROJECT_STATUS.md update" and paste it in yourself.
+
+To add a new project, say to a session: *"Set this repo up for my project tracker"*. It creates `PROJECT_STATUS.md` from [`templates/PROJECT_STATUS.md`](templates/PROJECT_STATUS.md). Then add the repo to `projects.json` and to your token's repository list.
+
+## Status file format
+
+```markdown
+---
+name: Recipe App
+phase: Building        # Idea | Planning | Building | Testing | Shipped | Paused
+priority: high         # high | medium | low
+updated: 2026-11-07
+blocked: false
+links: [https://github.com/phillbagnall/recipe-app]
+---
+## Summary
+## Next steps
+- [ ] Wire up login
+- [x] Database schema
+## Key info
+## Decisions
+## Log
+```
+
+Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
+
+## Custom domain (optional)
+
+To use your own domain, add it under *Settings → Pages → Custom domain*, then create a `CNAME` DNS record pointing at `phillbagnall.github.io`. The build uses relative paths, so nothing else needs to change.
+
+## Development
+
+```bash
+npm install
+npm run dev      # local dev server
+npm test         # parser/toggle unit tests (Vitest)
+npm run build    # typecheck + production build into dist/
+```
+
+Code map:
+- `src/status.ts`: parses `PROJECT_STATUS.md` and toggles a checkbox line. Tests are in `src/status.test.ts`.
+- `src/github.ts`: a minimal GitHub Contents API client that reads and writes files.
+- `src/data.ts`: settings, registry loading, and tick write-back. Ticks are queued per file, and on a conflict the file is re-fetched and the tick re-applied.
+- `src/markdown.tsx`: a small inline-markdown renderer that never injects raw HTML, since the page holds a token.
+- `src/components/*`: the overview cards, project detail page, all-open-actions list, and setup/settings screen.

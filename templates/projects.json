@@ -1,0 +1,6 @@
+{
+  "projects": [
+    { "id": "recipe-app", "repo": "phillbagnall/recipe-app" },
+    { "id": "garden-planner", "repo": "phillbagnall/project-tracker-data", "path": "projects/garden-planner.md" }
+  ]
+}

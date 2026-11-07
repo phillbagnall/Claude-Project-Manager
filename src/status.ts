@@ -1,0 +1,159 @@
+import YAML from 'yaml';
+
+export const PHASES = ['Idea', 'Planning', 'Building', 'Testing', 'Shipped', 'Paused'] as const;
+export type Phase = (typeof PHASES)[number];
+export const PRIORITIES = ['high', 'medium', 'low'] as const;
+export type Priority = (typeof PRIORITIES)[number];
+
+export interface StatusMeta {
+  name?: string;
+  phase?: Phase | string;
+  priority?: Priority | string;
+  updated?: string;
+  blocked?: boolean | string;
+  links?: string[];
+  [key: string]: unknown;
+}
+
+export interface Step {
+  text: string;
+  done: boolean;
+  /** 0-based line index in the full file text. */
+  line: number;
+  /** Section heading the checkbox sits under, e.g. "Next steps". */
+  section: string;
+}
+
+export interface Section {
+  title: string;
+  /** Raw markdown body of the section (without the heading). */
+  body: string;
+}
+
+export interface ParsedStatus {
+  meta: StatusMeta;
+  summary: string;
+  steps: Step[];
+  keyInfo: string[];
+  decisions: string[];
+  log: string[];
+  /** Every section in file order, for the detail view. */
+  sections: Section[];
+  /** Non-fatal problems found while parsing. */
+  warnings: string[];
+}
+
+const CHECKBOX = /^(\s*[-*+]\s+\[)([ xX])(\]\s+)(.*)$/;
+const BULLET = /^\s*[-*+]\s+(.*)$/;
+const HEADING = /^##\s+(.+?)\s*#*\s*$/;
+
+function splitFrontmatter(md: string): { yaml: string | null; bodyStart: number; lines: string[] } {
+  const lines = md.replace(/\r\n?/g, '\n').split('\n');
+  if (lines[0]?.trim() === '---') {
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '---' || lines[i].trim() === '...') {
+        return { yaml: lines.slice(1, i).join('\n'), bodyStart: i + 1, lines };
+      }
+    }
+  }
+  return { yaml: null, bodyStart: 0, lines };
+}
+
+function normalise(title: string): string {
+  return title.trim().toLowerCase().replace(/[^a-z ]/g, '').replace(/\s+/g, ' ');
+}
+
+function bullets(body: string): string[] {
+  return body
+    .split('\n')
+    .map((l) => l.match(BULLET)?.[1]?.trim())
+    .filter((x): x is string => !!x && !CHECKBOX.test(`- ${x}`));
+}
+
+export function parseStatus(md: string): ParsedStatus {
+  const warnings: string[] = [];
+  const { yaml, bodyStart, lines } = splitFrontmatter(md);
+
+  let meta: StatusMeta = {};
+  if (yaml === null) {
+    warnings.push('No frontmatter block (--- … ---) found.');
+  } else {
+    try {
+      const parsed = YAML.parse(yaml);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) meta = parsed as StatusMeta;
+      else warnings.push('Frontmatter is not a key/value map.');
+    } catch (e) {
+      warnings.push(`Frontmatter YAML error: ${(e as Error).message.split('\n')[0]}`);
+    }
+  }
+  // YAML turns bare dates into Date objects; keep them as ISO strings.
+  for (const [k, v] of Object.entries(meta)) {
+    if (v instanceof Date) meta[k] = v.toISOString().slice(0, 10);
+  }
+  if (meta.links && !Array.isArray(meta.links)) meta.links = [String(meta.links)];
+
+  const sections: Section[] = [];
+  const steps: Step[] = [];
+  let current: { title: string; start: number } | null = null;
+  const bodyLines: Record<string, string[]> = {};
+
+  for (let i = bodyStart; i < lines.length; i++) {
+    const line = lines[i];
+    const h = line.match(HEADING);
+    if (h) {
+      current = { title: h[1], start: i };
+      sections.push({ title: h[1], body: '' });
+      bodyLines[sections.length - 1] = [];
+      continue;
+    }
+    if (!current) continue;
+    bodyLines[sections.length - 1].push(line);
+    const cb = line.match(CHECKBOX);
+    if (cb) steps.push({ text: cb[4].trim(), done: cb[2] !== ' ', line: i, section: current.title });
+  }
+  sections.forEach((s, idx) => (s.body = bodyLines[idx].join('\n').trim()));
+
+  const find = (...names: string[]) =>
+    sections.find((s) => names.includes(normalise(s.title)))?.body ?? '';
+
+  return {
+    meta,
+    summary: find('summary', 'overview'),
+    steps,
+    keyInfo: bullets(find('key info', 'key information', 'notes')),
+    decisions: bullets(find('decisions')),
+    log: bullets(find('log', 'changelog', 'history')),
+    sections,
+    warnings,
+  };
+}
+
+/**
+ * Set a checkbox to `done`. Locates the step by its text (preferring `hintLine`
+ * when it still matches) so it works on a freshly re-fetched file after a conflict.
+ * Returns null when the step can no longer be found.
+ */
+export function setStep(md: string, text: string, done: boolean, hintLine?: number): string | null {
+  const eol = md.includes('\r\n') ? '\r\n' : '\n';
+  const lines = md.split(/\r?\n/);
+  const matches = (i: number) => lines[i]?.match(CHECKBOX)?.[4].trim() === text;
+
+  let idx = -1;
+  if (hintLine !== undefined && matches(hintLine)) idx = hintLine;
+  else idx = lines.findIndex((_, i) => matches(i));
+  if (idx === -1) return null;
+
+  lines[idx] = lines[idx].replace(CHECKBOX, (_m, a, _b, c, d) => `${a}${done ? 'x' : ' '}${c}${d}`);
+  return lines.join(eol);
+}
+
+export function daysSince(date: string | undefined, now = new Date()): number | null {
+  if (!date) return null;
+  const t = Date.parse(date);
+  if (Number.isNaN(t)) return null;
+  return Math.max(0, Math.floor((now.getTime() - t) / 86_400_000));
+}
+
+export function isBlocked(meta: StatusMeta): boolean {
+  return meta.blocked === true || meta.blocked === 'true' || meta.blocked === 'yes';
+}
