@@ -66,7 +66,7 @@ links: [https://github.com/phillbagnall/recipe-app]
 
 Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
 
-`## Notes` is yours: the **Add note** box on a project's page appends a dated bullet there (extra lines become sub-points) and commits it. Claude sessions are told to read your notes but never change them.
+`## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, but never edit or delete existing ones unless you say so.
 
 ## Custom domain (optional)
 

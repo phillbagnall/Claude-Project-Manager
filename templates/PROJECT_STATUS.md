@@ -16,7 +16,7 @@ links: []              # repo, live site, Claude session URLs…
 - Facts you'd otherwise scroll back through chats for (URLs, account names, where config lives)
 
 ## Notes
-- Your own notes (the dashboard's Add note box appends here; Claude leaves them alone)
+- Your notes: add them with the dashboard's Add note box, or ask Claude to add one
 
 ## Decisions
 - YYYY-MM-DD: What was decided and why
