@@ -15,7 +15,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - [x] Create private repo `project-tracker-data` with `projects.json` (include this repo)
 - [x] Create fine-grained token (Contents: read/write on selected repos) and connect the dashboard
 - [x] Add piano-trainer, VideoTagger and Financial-Dashboard to the token's repository access
-- [ ] Paste the "Global instruction for Claude Code on your PC" note into `~/.claude/CLAUDE.md` on the PC
+- [x] Paste the "Global instruction for Claude Code on your PC" note into `~/.claude/CLAUDE.md` on the PC
 - [x] Add status files and the CLAUDE.md snippet to piano-trainer, VideoTagger and Financial-Dashboard
 - [ ] Set up Cowork with a local clone of `project-tracker-data`
 - [ ] Optional: point custom domain at GitHub Pages
