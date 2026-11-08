@@ -53,9 +53,9 @@ export function Setup({
         </label>
       </details>
       <p className="small muted">
-        <a href={TOKEN_URL} target="_blank" rel="noreferrer">Create a token</a> → Repository access: <em>Only select
-        repositories</em> (the data repo + each project repo) → Permissions: <em>Contents: Read and write</em>. Don't
-        save it on a shared device.
+        <a href={TOKEN_URL} target="_blank" rel="noreferrer">Create a token</a> → Repository access: <em>All
+        repositories</em> (simplest) or <em>Only select repositories</em> (the data repo + each project repo) →
+        Permissions: <em>Contents: Read and write</em>. Don't save it on a shared device.
       </p>
       <div className="row">
         <button className="primary" type="submit" disabled={!canSave}>Save &amp; load</button>

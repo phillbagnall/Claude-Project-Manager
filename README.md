@@ -26,10 +26,10 @@ All of these steps work in the GitHub website on mobile.
    ```
    Each entry needs `repo`. The optional fields are `path` (default `PROJECT_STATUS.md`), `branch` (default: the repo's default branch), `id` and `name`, and `color` (one of red, orange, amber, green, teal, blue, purple, pink). You normally set `color` from a project's page on the dashboard rather than by hand. Projects with no repo of their own, such as Cowork work, live as `projects/<slug>.md` in this data repo.
 3. **Create a token.** Use a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new):
-   - Repository access: **Only select repositories**. Choose `project-tracker-data` and every project repo you track.
+   - Repository access: **All repositories** (simplest; new projects then appear with no token change) or **Only select repositories** (the data repo plus each project repo; tighter, but you must add each new repo to the token).
    - Permissions: **Contents → Read and write**. Nothing else is needed.
    - Expiry: up to a year. When it expires, the dashboard asks for a new one.
-   - When you add a new project repo later, edit the token to include that repo.
+   - If you chose selected repositories, edit the token to include each new project repo.
 4. **Open the dashboard** and enter `phillbagnall/project-tracker-data` and the token. Do this on each device you use; the token is stored per browser.
 
 5. **Optional: install it as an app on your phone.** Open the dashboard in Chrome, then tap ⋮ → **Add to home screen** → **Install**. It opens full-screen like an app and keeps your token, because the app and Chrome share the site's storage.
@@ -43,9 +43,9 @@ Paste [`templates/CLAUDE.md.snippet`](templates/CLAUDE.md.snippet) into each pro
 - **Cowork / non-repo work:** keep a local clone of `project-tracker-data` and ask Cowork to update `projects/<slug>.md` there and push.
 - **Ordinary claude.ai chats** don't read CLAUDE.md. Ask them to "write a PROJECT_STATUS.md update" and paste it in yourself.
 
-**Projects that are only on your PC (no GitHub repo yet):** open a Claude Code chat in the project's folder and paste the prompt from [`templates/ADD_PROJECT_PROMPT.md`](templates/ADD_PROJECT_PROMPT.md). It creates a private repo, writes the status file and CLAUDE.md section, and registers the project in `projects.json`. Afterwards you only add the repo to your token.
+**Projects that are only on your PC (no GitHub repo yet):** open a Claude Code chat in the project's folder and paste the prompt from [`templates/ADD_PROJECT_PROMPT.md`](templates/ADD_PROJECT_PROMPT.md). It creates a private repo, writes the status file and CLAUDE.md section, and registers the project in `projects.json`. Afterwards just tap ↻ (if your token is limited to selected repositories, add the new repo to it first).
 
-To add a new project, say to a session: *"Set this repo up for my project tracker"*. It creates `PROJECT_STATUS.md` from [`templates/PROJECT_STATUS.md`](templates/PROJECT_STATUS.md). Then add the repo to `projects.json` and to your token's repository list.
+To add a new project, say to a session: *"Set this repo up for my project tracker"*. It creates `PROJECT_STATUS.md` from [`templates/PROJECT_STATUS.md`](templates/PROJECT_STATUS.md). Then add the repo to `projects.json` (and to your token, if it's limited to selected repositories).
 
 ## Status file format
 

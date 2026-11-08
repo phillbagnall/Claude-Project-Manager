@@ -40,5 +40,5 @@ links: [https://github.com/phillbagnall/<name>]
 
 7. Register it: add {"id": "<name in lowercase>", "repo": "phillbagnall/<name>"} to the "projects" list in projects.json in my private repo phillbagnall/project-tracker-data. Keep the existing entries and keep the JSON valid. Use a temporary shallow clone (edit, commit, push, then delete the clone) or the gh API. If you can't get access, show me the exact line to add on GitHub myself.
 
-8. Finish by reminding me to give my dashboard token access to the new repo (https://github.com/settings/personal-access-tokens -> my token -> Edit -> Repository access -> add the repo -> Update) and then tap refresh on the dashboard. Give me the repo URL.
+8. Finish by giving me the repo URL and telling me to tap refresh on the dashboard. (My dashboard token has access to all my repos, so nothing else is needed.)
 ```
