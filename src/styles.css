@@ -294,7 +294,7 @@ button.collapse-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
 .tabs button.tabs-action { margin-left: auto; padding: 0 2px; border: 0; color: var(--accent); font-weight: 500; white-space: nowrap; }
 
 /* Colour-coded tiles */
-.card.colored {
+.card.colored, .panel.colored {
   border-left: 5px solid var(--tile);
   background: color-mix(in srgb, var(--tile) 9%, var(--surface));
   padding-left: 13px;

@@ -103,6 +103,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-08: Tile colours also shown on the Open actions tab
 - 2026-11-08: Tile colours (set on each project page, saved in projects.json); Back always returns to the overview
 - 2026-11-07: Collapsible project cards on the overview (Collapse all / Expand all)
 - 2026-11-07: Added global PC instruction (templates/GLOBAL_CLAUDE.md + note)

@@ -22,7 +22,11 @@ export function ActionList({
     <div className="actions">
       <p className="muted">{total} open action{total === 1 ? '' : 's'} across {groups.length} project{groups.length === 1 ? '' : 's'}</p>
       {groups.map(({ p, open }) => (
-        <section key={p.entry.id} className="panel">
+        <section
+          key={p.entry.id}
+          className={`panel${p.entry.color ? ' colored' : ''}`}
+          style={p.entry.color ? ({ '--tile': `var(--c-${p.entry.color})` } as React.CSSProperties) : undefined}
+        >
           <h2>
             <button className="link heading-link" onClick={() => onOpen(p.entry.id)}>{displayName(p)}</button>
             <PriorityDot priority={p.status?.meta.priority as string} />
