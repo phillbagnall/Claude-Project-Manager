@@ -96,6 +96,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
     - Never: create an empty file named .no-dashboard in the project root and commit it. Never ask in a folder that has that file.
   - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD: text" (extra lines as indented sub-points), then commit and push.
   ```
+- 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
 
 ## Decisions
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
