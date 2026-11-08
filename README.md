@@ -24,7 +24,7 @@ All of these steps work in the GitHub website on mobile.
        { "id": "garden", "repo": "phillbagnall/project-tracker-data", "path": "projects/garden.md" }
    ] }
    ```
-   Each entry needs `repo`. The optional fields are `path` (default `PROJECT_STATUS.md`), `branch` (default: the repo's default branch), `id` and `name`. Projects with no repo of their own, such as Cowork work, live as `projects/<slug>.md` in this data repo.
+   Each entry needs `repo`. The optional fields are `path` (default `PROJECT_STATUS.md`), `branch` (default: the repo's default branch), `id` and `name`, and `color` (one of red, orange, amber, green, teal, blue, purple, pink). You normally set `color` from a project's page on the dashboard rather than by hand. Projects with no repo of their own, such as Cowork work, live as `projects/<slug>.md` in this data repo.
 3. **Create a token.** Use a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new):
    - Repository access: **Only select repositories**. Choose `project-tracker-data` and every project repo you track.
    - Permissions: **Contents → Read and write**. Nothing else is needed.

@@ -37,7 +37,10 @@ export function ProjectCard({
   const done = status.steps.filter((s) => s.done).length;
   const firstSentence = status.summary.split(/(?<=[.!?])\s/)[0] ?? '';
   return (
-    <article className={`card${collapsed ? ' collapsed' : ''}`}>
+    <article
+      className={`card${collapsed ? ' collapsed' : ''}${project.entry.color ? ' colored' : ''}`}
+      style={project.entry.color ? ({ '--tile': `var(--c-${project.entry.color})` } as React.CSSProperties) : undefined}
+    >
       <header className="card-head">
         <button className="card-title" onClick={onOpen}>
           <h2>{displayName(project)}</h2>

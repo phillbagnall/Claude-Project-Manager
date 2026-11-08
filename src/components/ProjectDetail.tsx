@@ -4,6 +4,8 @@ import { Blocks, Inline, shortUrl } from '../markdown';
 import type { Step } from '../status';
 import { Blocked, PhaseBadge, PriorityDot, Progress, Updated } from './Badges';
 import { displayName } from './ProjectCard';
+import type { ColorName } from '../colors';
+import { ColorPicker } from './ColorPicker';
 import { NoteForm } from './NoteForm';
 import { NoteList } from './NoteList';
 import { StepItem } from './StepItem';
@@ -15,12 +17,14 @@ export function ProjectDetail({
   onBack,
   onToggle,
   onAddNote,
+  onSetColor,
   demo,
 }: {
   project: Project;
   onBack: () => void;
   onToggle: (step: Step, done: boolean) => void;
   onAddNote: (note: string) => Promise<void>;
+  onSetColor: (color: ColorName | null) => Promise<void>;
   demo: boolean;
 }) {
   const { status, entry } = project;
@@ -58,7 +62,7 @@ export function ProjectDetail({
   return (
     <div className="detail">
       <button className="link back" onClick={onBack}>← All projects</button>
-      <header className="detail-head">
+      <header className="detail-head" style={entry.color ? { borderLeftColor: `var(--c-${entry.color})` } : undefined} data-colored={entry.color ? '' : undefined}>
         <h1>{displayName(project)}</h1>
         <div className="meta-row">
           <PhaseBadge phase={status?.meta.phase as string} />
@@ -72,6 +76,7 @@ export function ProjectDetail({
             <a key={l} href={l} target="_blank" rel="noreferrer">{shortUrl(l)}</a>
           ))}
         </div>
+        <ColorPicker value={entry.color} onChange={onSetColor} />
       </header>
 
       {!status && <p className={project.loading ? 'muted' : 'error'}>{project.loading ? 'Loading…' : project.error}</p>}
@@ -91,7 +96,7 @@ export function ProjectDetail({
       {status && (
         <section className="panel">
           <h2>Notes</h2>
-          {notesBody ? <NoteList body={notesBody} /> : <p className="muted small">Your own notes. Claude sessions read them but leave them alone.</p>}
+          {notesBody ? <NoteList body={notesBody} /> : <p className="muted small">Your notes. Add one here, or ask a Claude session to add one.</p>}
           <NoteForm onAdd={onAddNote} />
         </section>
       )}

@@ -54,7 +54,7 @@ export function App() {
   const [route, setRoute] = useState<Route>(parseHash);
   const [showSettings, setShowSettings] = useState(false);
   const [prefs, setPrefs] = useState<ViewPrefs>(loadPrefs);
-  const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote } = useProjects(settings);
+  const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor } = useProjects(settings);
 
   useEffect(() => {
     const on = () => {
@@ -207,7 +207,7 @@ export function App() {
 
         {route.view === 'project' &&
           (current ? (
-            <ProjectDetail project={current} demo={settings.demo} onBack={() => history.length > 1 ? history.back() : go('/')} onToggle={(s, d) => toggleStep(current.entry.id, s, d)} onAddNote={(n) => addNote(current.entry.id, n)} />
+            <ProjectDetail project={current} demo={settings.demo} onBack={() => go('/')} onToggle={(s, d) => toggleStep(current.entry.id, s, d)} onAddNote={(n) => addNote(current.entry.id, n)} onSetColor={(c) => setColor(current.entry.id, c)} />
           ) : (
             <p className="empty">{refreshing ? 'Loading…' : <>Project not found. <button className="link" onClick={() => go('/')}>Back</button></>}</p>
           ))}

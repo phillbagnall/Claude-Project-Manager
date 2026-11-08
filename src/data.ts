@@ -1,20 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEMO_FILES, DEMO_REGISTRY } from './demo';
+import type { ColorName } from './colors';
 import { GitHubError, getFile, putFile } from './github';
+import { parseRegistry, projectPath, withColor, type RegistryEntry } from './registry';
+export { projectPath, type RegistryEntry };
 import { addNote as addNoteToText, parseStatus, setStep, today, type ParsedStatus, type Step } from './status';
 
-export interface RegistryEntry {
-  /** Unique slug. */
-  id: string;
-  /** owner/name */
-  repo: string;
-  /** Path to the status file inside the repo. Default PROJECT_STATUS.md */
-  path?: string;
-  /** Branch to read/write. Default: the repo's default branch. */
-  branch?: string;
-  /** Optional display name (overridden by the file's frontmatter name). */
-  name?: string;
-}
 
 export interface Settings {
   token: string;
@@ -56,23 +47,6 @@ export function saveSettings(s: Settings) {
   } catch {
     /* storage unavailable */
   }
-}
-
-export const projectPath = (e: RegistryEntry) => e.path ?? 'PROJECT_STATUS.md';
-
-function parseRegistry(text: string): RegistryEntry[] {
-  const json = JSON.parse(text);
-  const list: unknown = Array.isArray(json) ? json : json?.projects;
-  if (!Array.isArray(list)) throw new Error('projects.json must be an array or { "projects": [...] }');
-  const seen = new Set<string>();
-  return list
-    .filter((e): e is RegistryEntry => !!e && typeof e.repo === 'string')
-    .map((e) => {
-      let id = e.id || `${e.repo}/${projectPath(e)}`;
-      while (seen.has(id)) id += '_';
-      seen.add(id);
-      return { ...e, id };
-    });
 }
 
 /** Parse server text with any pending (uncommitted) ticks applied on top. */
@@ -270,5 +244,35 @@ export function useProjects(settings: Settings) {
     [editFile],
   );
 
-  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote };
+  /** Set (or clear) a project's tile colour in projects.json, retrying once on a conflict. */
+  const setColor = useCallback(
+    async (id: string, color: ColorName | null): Promise<void> => {
+      const before = latest.current.find((p) => p.entry.id === id)?.entry.color;
+      const apply = (c: ColorName | undefined) =>
+        setProjects((ps) => ps.map((x) => (x.entry.id === id ? { ...x, entry: { ...x.entry, color: c } } : x)));
+      apply(color ?? undefined);
+      if (settings.demo) return;
+      const message = `dashboard: ${color ? `colour ${color}` : 'clear colour'} for ${id}`;
+      try {
+        const write = async () => {
+          const reg = await getFile(settings.token, settings.dataRepo, settings.registryPath);
+          const next = withColor(reg.text, id, color);
+          if (next !== reg.text) await putFile(settings.token, settings.dataRepo, settings.registryPath, next, reg.sha, message);
+        };
+        try {
+          await write();
+        } catch (e) {
+          if (!(e instanceof GitHubError && e.isConflict)) throw e;
+          await write();
+        }
+      } catch (e) {
+        if (e instanceof GitHubError && e.isAuth) setAuthError(true);
+        apply(before);
+        throw new Error(`Couldn't save the colour: ${errMsg(e)}`);
+      }
+    },
+    [settings],
+  );
+
+  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor };
 }
