@@ -218,3 +218,25 @@ export function today(now = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0');
   return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
 }
+
+/** YAML-safe scalar for a single-line name: plain when unambiguous, otherwise JSON-quoted. */
+function yamlScalar(v: string): string {
+  const plain = /^[A-Za-z0-9(][^:#\n]*$/.test(v) && !/\s$/.test(v) && !/^(true|false|null|yes|no|on|off|~|[-+]?\d[\d.,eE+-]*)$/i.test(v);
+  return plain ? v : JSON.stringify(v);
+}
+
+/** Set the frontmatter `name:` (adding frontmatter if the file has none). Other lines are untouched. */
+export function setName(md: string, name: string): string {
+  const clean = name.replace(/\s+/g, ' ').trim();
+  if (!clean) return md;
+  const eol = md.includes('\r\n') ? '\r\n' : '\n';
+  const lines = md.split(/\r?\n/);
+  const line = `name: ${yamlScalar(clean)}`;
+  const { yaml, bodyStart } = splitFrontmatter(md);
+  if (yaml === null) return ['---', line, '---', ...lines].join(eol);
+  const end = bodyStart - 1; // index of the closing ---
+  const idx = lines.findIndex((l, i) => i > 0 && i < end && /^name\s*:/.test(l));
+  if (idx !== -1) lines[idx] = line;
+  else lines.splice(1, 0, line);
+  return lines.join(eol);
+}

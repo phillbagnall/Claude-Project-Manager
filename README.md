@@ -68,7 +68,7 @@ links: [https://github.com/phillbagnall/recipe-app]
 ## Log
 ```
 
-Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
+The tile's name is the `name:` line. Rename a project with the ✏️ next to its title on its page; this changes only that line. Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
 
 `## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, but never edit or delete existing ones unless you say so.
 

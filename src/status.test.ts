@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addNote, daysSince, parseStatus, setStep, today } from './status';
+import { addNote, daysSince, parseStatus, setName, setStep, today } from './status';
 
 const SAMPLE = `---
 name: Recipe App
@@ -161,5 +161,31 @@ describe('fenced code blocks', () => {
     const n = splitNotes(parseStatus(md).notes);
     expect(n).toHaveLength(1);
     expect(n[0].body).toBe('```text\n## Summary\n- [ ] not a step\n```');
+  });
+});
+
+describe('setName', () => {
+  it('replaces only the name line', () => {
+    const out = setName(SAMPLE, 'Musical Meadow');
+    const changed = out.split('\n').filter((l, i) => l !== SAMPLE.split('\n')[i]);
+    expect(changed).toEqual(['name: Musical Meadow']);
+    expect(parseStatus(out).meta.name).toBe('Musical Meadow');
+  });
+  it('quotes names YAML would misread, and they parse back exactly', () => {
+    for (const n of ['Recipes: v2', 'Tag #1', '"Quoted"', '- dash first', 'true', '2026', 'Trailing ']) {
+      expect(parseStatus(setName(SAMPLE, n)).meta.name).toBe(n.trim());
+    }
+    expect(setName(SAMPLE, 'Musical Meadow (piano trainer)')).toContain('name: Musical Meadow (piano trainer)\n');
+  });
+  it('adds a name line or frontmatter when missing, keeps CRLF and other keys', () => {
+    const noName = '---\nphase: Building\n---\n## Summary\nx\n';
+    expect(setName(noName, 'X')).toBe('---\nname: X\nphase: Building\n---\n## Summary\nx\n');
+    expect(setName('## Summary\nx', 'Y')).toBe('---\nname: Y\n---\n## Summary\nx');
+    const crlf = setName(SAMPLE.replace(/\n/g, '\r\n'), 'Z');
+    expect(crlf).toContain('name: Z\r\nphase: Building\r\n');
+    expect(parseStatus(crlf).meta.priority).toBe('high');
+  });
+  it('ignores blank names', () => {
+    expect(setName(SAMPLE, '   ')).toBe(SAMPLE);
   });
 });

@@ -310,3 +310,14 @@ button.collapse-toggle[aria-expanded="false"] svg { transform: rotate(-90deg); }
 .swatch.none {
   background: linear-gradient(135deg, transparent 45%, var(--muted) 45%, var(--muted) 55%, transparent 55%), var(--surface);
 }
+
+/* Rename */
+.title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.title-row h1 { min-width: 0; overflow-wrap: anywhere; }
+button.rename { width: 36px; height: 36px; min-height: 36px; border: 0; background: none; color: var(--muted); }
+button.rename:hover { color: var(--text); }
+.title-edit { display: grid; gap: 8px; }
+.title-edit input {
+  width: 100%; font-size: 22px; font-weight: 700; padding: 0.3em 0.5em; min-height: 48px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: inherit;
+}

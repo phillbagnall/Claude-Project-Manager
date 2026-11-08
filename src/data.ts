@@ -4,7 +4,7 @@ import type { ColorName } from './colors';
 import { GitHubError, getFile, putFile } from './github';
 import { parseRegistry, projectPath, withColor, type RegistryEntry } from './registry';
 export { projectPath, type RegistryEntry };
-import { addNote as addNoteToText, parseStatus, setStep, today, type ParsedStatus, type Step } from './status';
+import { addNote as addNoteToText, parseStatus, setName, setStep, today, type ParsedStatus, type Step } from './status';
 
 
 export interface Settings {
@@ -274,5 +274,10 @@ export function useProjects(settings: Settings) {
     [settings],
   );
 
-  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor };
+  const rename = useCallback(
+    (id: string, name: string) => editFile(id, (text) => setName(text, name), `dashboard: rename to "${name.trim().slice(0, 60)}"`),
+    [editFile],
+  );
+
+  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename };
 }

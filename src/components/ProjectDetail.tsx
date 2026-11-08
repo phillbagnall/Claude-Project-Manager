@@ -7,6 +7,7 @@ import { displayName } from './ProjectCard';
 import type { ColorName } from '../colors';
 import { ColorPicker } from './ColorPicker';
 import { NoteForm } from './NoteForm';
+import { TitleEditor } from './TitleEditor';
 import { NoteList } from './NoteList';
 import { StepItem } from './StepItem';
 
@@ -18,6 +19,7 @@ export function ProjectDetail({
   onToggle,
   onAddNote,
   onSetColor,
+  onRename,
   demo,
 }: {
   project: Project;
@@ -25,6 +27,7 @@ export function ProjectDetail({
   onToggle: (step: Step, done: boolean) => void;
   onAddNote: (note: string) => Promise<void>;
   onSetColor: (color: ColorName | null) => Promise<void>;
+  onRename: (name: string) => Promise<void>;
   demo: boolean;
 }) {
   const { status, entry } = project;
@@ -63,7 +66,7 @@ export function ProjectDetail({
     <div className="detail">
       <button className="link back" onClick={onBack}>← All projects</button>
       <header className="detail-head" style={entry.color ? { borderLeftColor: `var(--c-${entry.color})` } : undefined} data-colored={entry.color ? '' : undefined}>
-        <h1>{displayName(project)}</h1>
+        <TitleEditor name={displayName(project)} onRename={status ? onRename : undefined} />
         <div className="meta-row">
           <PhaseBadge phase={status?.meta.phase as string} />
           <PriorityDot priority={status?.meta.priority as string} />
