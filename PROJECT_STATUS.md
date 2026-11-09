@@ -101,12 +101,60 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
 - 2026-11-08: Add section for visuals created by Claude, such as screenshots or video, along with a brief description and where in the build the snapshot is from. Upload all unless otherwise specified by the user. If possible, upload previous content from before the project manager was created.
 
+## Visuals
+- 2026-11-07: Sign-in screen: connect the data repo and token, or try demo data
+  - Build: first version (2303107)
+  - ![Sign-in screen](docs/visuals/2026-11-07-sign-in-phone.png)
+- 2026-11-07: Project overview on a phone (demo data)
+  - Build: first version (2303107)
+  - ![Project overview on a phone](docs/visuals/2026-11-07-overview-phone.png)
+- 2026-11-07: Project overview on desktop, dark mode (demo data)
+  - Build: first version (2303107)
+  - ![Project overview on desktop, dark mode](docs/visuals/2026-11-07-overview-desktop-dark.png)
+- 2026-11-07: Project page: summary, checklist, key info, decisions and log
+  - Build: first version (2303107)
+  - ![Project page](docs/visuals/2026-11-07-project-page-phone.png)
+- 2026-11-07: Notes with the Add note box (test data)
+  - Build: project notes (812ecad)
+  - ![Notes with the Add note box](docs/visuals/2026-11-07-notes-add.png)
+- 2026-11-07: Notes as separate collapsible cards, one opened
+  - Build: note cards (febaf33)
+  - ![Notes as separate collapsible cards, one opened](docs/visuals/2026-11-07-notes-cards.png)
+- 2026-11-07: Copyable add-project prompt inside a note
+  - Build: copyable code blocks (2615aa7)
+  - ![Copyable add-project prompt inside a note](docs/visuals/2026-11-07-note-copy-prompt.png)
+- 2026-11-07: Overview with every project card collapsed
+  - Build: collapsible cards (1e78ad9)
+  - ![Overview with every project card collapsed](docs/visuals/2026-11-07-overview-collapsed.png)
+- 2026-11-08: Tile colour picker on a project page
+  - Build: tile colours (1fe3ee7)
+  - ![Tile colour picker on a project page](docs/visuals/2026-11-08-colour-picker.png)
+- 2026-11-08: Colour-coded tiles, light mode (test data)
+  - Build: tile colours (1fe3ee7)
+  - ![Colour-coded tiles, light mode](docs/visuals/2026-11-08-colour-tiles-light.png)
+- 2026-11-08: Open actions grouped by project, in tile colours
+  - Build: colours on Open actions (40bf9cc)
+  - ![Open actions grouped by project, in tile colours](docs/visuals/2026-11-08-open-actions-colours.png)
+- 2026-11-08: Renaming a project from its page
+  - Build: rename (f263c3a)
+  - ![Renaming a project from its page](docs/visuals/2026-11-08-rename.png)
+- 2026-11-09: Note cards showing who wrote them (Claude or you), with edit on your own
+  - Build: note authors and Visuals (772aa6f)
+  - ![Note cards showing who wrote them](docs/visuals/2026-11-09-note-authors.png)
+- 2026-11-09: Editing one of your own notes
+  - Build: note authors and Visuals (772aa6f)
+  - ![Editing one of your own notes](docs/visuals/2026-11-09-note-editing.png)
+- 2026-11-09: The Visuals gallery on a project page (test data)
+  - Build: note authors and Visuals (772aa6f)
+  - ![The Visuals gallery on a project page](docs/visuals/2026-11-09-visuals-gallery.png)
+
 ## Decisions
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
 - 2026-11-07: Status file lives in each project's own repo; updates are automatic via CLAUDE.md instruction
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-09: Added 15 screenshots from building the dashboard to Visuals
 - 2026-11-09: Note authors (Claude/you icons), edit your own notes, and a Visuals gallery for Claude's screenshots/videos
 - 2026-11-08: Token now covers all repositories; removed 'add the repo to your token' steps from notes, prompt and README
 - 2026-11-08: Rename projects from their page (✏️ next to the title)
