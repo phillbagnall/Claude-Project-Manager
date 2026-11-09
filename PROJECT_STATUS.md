@@ -103,6 +103,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-09: To-Do
   - Collapsible sections in a project
   - Cycle through visuals by using arrow keys or swiping on a phone, just like a gallery view
+  - Auto-fit width for Windows and Mac, just like I have for the phone view.
 
 ## Visuals
 - 2026-11-07: Sign-in screen: connect the data repo and token, or try demo data
