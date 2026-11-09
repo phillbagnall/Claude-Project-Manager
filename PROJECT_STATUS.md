@@ -104,6 +104,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   - Collapsible sections in a project.
   - Cycle through visuals by using arrow keys, swiping on a phone, or arrow buttons on screen, just like a gallery view.
   - Auto-fit width for Windows and Mac, just like I have for the phone view.
+  - Ability to delete user-created notes as well.
 
 ## Visuals
 - 2026-11-07: Sign-in screen: connect the data repo and token, or try demo data
