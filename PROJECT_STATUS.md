@@ -100,11 +100,11 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   ```
 - 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
 - 2026-11-08: Add section for visuals created by Claude, such as screenshots or video, along with a brief description and where in the build the snapshot is from. Upload all unless otherwise specified by the user. If possible, upload previous content from before the project manager was created.
-- 2026-11-09: To-Do
-  - Collapsible sections in a project.
-  - Cycle through visuals by using arrow keys, swiping on a phone, or arrow buttons on screen, just like a gallery view.
-  - Auto-fit width for Windows and Mac, just like I have for the phone view.
-  - Ability to delete user-created notes as well.
+- 2026-11-09: To-Do (all done 2026-11-09)
+  - Done: Collapsible sections in a project.
+  - Done: Cycle through visuals by using arrow keys, swiping on a phone, or arrow buttons on screen, just like a gallery view.
+  - Done: Auto-fit width for Windows and Mac, just like I have for the phone view.
+  - Done: Ability to delete user-created notes as well.
 
 ## Visuals
 - 2026-11-07: Sign-in screen: connect the data repo and token, or try demo data
