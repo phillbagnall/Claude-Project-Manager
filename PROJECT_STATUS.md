@@ -152,6 +152,12 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-09: The Visuals gallery on a project page (test data)
   - Build: note authors and Visuals (772aa6f)
   - ![The Visuals gallery on a project page](docs/visuals/2026-11-09-visuals-gallery.png)
+- 2026-11-09: Project page on a wide desktop window with every section collapsed (test data)
+  - Build: collapsible sections, gallery, full width (0ce6319)
+  - ![Project page with sections collapsed](docs/visuals/2026-11-09-sections-collapsed.jpg)
+- 2026-11-09: Visuals gallery on a phone, with previous/next arrows and counter (test data)
+  - Build: collapsible sections, gallery, full width (0ce6319)
+  - ![Visuals gallery on a phone](docs/visuals/2026-11-09-gallery-phone.jpg)
 
 ## Decisions
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
