@@ -46,10 +46,32 @@ function AuthorIcon({ author }: { author: NoteAuthor }) {
   );
 }
 
-function NoteEditor({ initial, onSave, onCancel }: { initial: string; onSave: (t: string) => Promise<void>; onCancel: () => void }) {
+function NoteEditor({
+  initial,
+  onSave,
+  onCancel,
+  onDelete,
+}: {
+  initial: string;
+  onSave: (t: string) => Promise<void>;
+  onCancel: () => void;
+  onDelete?: () => Promise<void>;
+}) {
   const [text, setText] = useState(initial);
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string>();
+  const doDelete = async () => {
+    setBusy(true);
+    setError(undefined);
+    try {
+      await onDelete!();
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
+      setConfirmDelete(false);
+    }
+  };
   return (
     <form
       className="note-edit"
@@ -68,10 +90,19 @@ function NoteEditor({ initial, onSave, onCancel }: { initial: string; onSave: (t
     >
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={Math.min(12, Math.max(3, text.split('\n').length + 1))} aria-label="Edit note" autoFocus />
       <p className="muted small">First line is the title; each extra line is a sub-point.</p>
-      <div className="row">
-        <button className="primary" type="submit" disabled={!text.trim() || busy}>{busy ? 'Saving…' : 'Save'}</button>
-        <button type="button" onClick={onCancel} disabled={busy}>Cancel</button>
-      </div>
+      {confirmDelete ? (
+        <div className="row confirm-row">
+          <span className="small">Delete this note? This can't be undone here.</span>
+          <button type="button" className="danger" onClick={doDelete} disabled={busy}>{busy ? 'Deleting…' : 'Delete'}</button>
+          <button type="button" onClick={() => setConfirmDelete(false)} disabled={busy}>Keep</button>
+        </div>
+      ) : (
+        <div className="row">
+          <button className="primary" type="submit" disabled={!text.trim() || busy}>{busy ? 'Saving…' : 'Save'}</button>
+          <button type="button" onClick={onCancel} disabled={busy}>Cancel</button>
+          {onDelete && <button type="button" className="danger push-right" onClick={() => setConfirmDelete(true)} disabled={busy}>Delete</button>}
+        </div>
+      )}
       {error && <p className="error small">{error}</p>}
     </form>
   );
@@ -81,11 +112,13 @@ export function NoteList({
   body,
   raw,
   onEdit,
+  onDelete,
 }: {
   body: string;
   /** Full file text, used to fill the edit box. */
   raw?: string;
   onEdit?: (index: number, text: string) => Promise<void>;
+  onDelete?: (index: number) => Promise<void>;
 }) {
   const [editing, setEditing] = useState<number | null>(null);
   const notes = splitNotes(body);
@@ -100,6 +133,13 @@ export function NoteList({
               <NoteEditor
                 initial={noteEditText(raw!, n.index) ?? n.title}
                 onCancel={() => setEditing(null)}
+                onDelete={
+                  onDelete &&
+                  (async () => {
+                    await onDelete(n.index);
+                    setEditing(null);
+                  })
+                }
                 onSave={async (t) => {
                   await onEdit!(n.index, t);
                   setEditing(null);
@@ -112,8 +152,8 @@ export function NoteList({
           <button
             type="button"
             className="icon note-edit-btn"
-            aria-label="Edit note"
-            title="Edit"
+            aria-label="Edit or delete note"
+            title="Edit or delete"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

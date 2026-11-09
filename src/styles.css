@@ -98,7 +98,9 @@ button.link {
 }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
-.shell { max-width: 1180px; margin: 0 auto; padding: 0 16px calc(32px + env(safe-area-inset-bottom)); }
+/* Fills the window at any width (phone, Windows, Mac); only the gutters grow on bigger screens. */
+.shell { --gutter: 16px; width: 100%; margin: 0 auto; padding: 0 var(--gutter) calc(32px + env(safe-area-inset-bottom)); }
+@media (min-width: 900px) { .shell { --gutter: 28px; } }
 main.narrow { max-width: 560px; margin: 0 auto; }
 
 .topbar {
@@ -136,7 +138,7 @@ button.icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; s
 }
 
 .filters { display: grid; gap: 10px; margin-bottom: 14px; }
-.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--gutter, 16px)); padding: 0 var(--gutter, 16px); }
 .chips::-webkit-scrollbar { display: none; }
 .chip { border-radius: 99px; padding: 0.3em 0.9em; min-height: 34px; white-space: nowrap; font-size: 14px; }
 .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
@@ -220,8 +222,8 @@ p.error.panel { background: var(--danger-bg); border-color: transparent; }
 .step-text { min-width: 0; overflow-wrap: anywhere; font-size: 14.5px; }
 .step-context { display: block; font-size: 12px; color: var(--muted); }
 
-.detail { display: grid; gap: 12px; max-width: 760px; }
-.back { justify-self: start; margin-top: 4px; }
+.detail { display: grid; gap: 12px; }
+.detail-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 4px; }
 .detail-head { display: grid; gap: 8px; }
 .detail-head h1 { font-size: 24px; }
 .links { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; }
@@ -229,7 +231,19 @@ p.error.panel { background: var(--danger-bg); border-color: transparent; }
 .panel h2 .progress { flex: 1; max-width: 200px; }
 .panel h2 .prio { text-transform: capitalize; letter-spacing: 0; }
 .heading-link { font-size: 15px; text-transform: none; letter-spacing: 0; color: var(--text); font-weight: 700; text-align: left; }
-.actions { display: grid; gap: 12px; max-width: 760px; }
+.actions { display: grid; gap: 12px; }
+
+/* Collapsible project-page sections */
+.panel h2 button.panel-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 0; background: none; padding: 4px 8px 4px 4px; margin: -4px 0 -4px -4px; min-height: 32px; border-radius: 8px;
+  font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left;
+}
+.panel h2 button.panel-toggle:hover { background: var(--surface-2); color: var(--text); }
+.panel-toggle .chev { margin-top: 0; transform: rotate(90deg); }
+.panel-toggle[aria-expanded="false"] .chev { transform: none; }
+.panel.panel-collapsed h2 { margin-bottom: 0; }
+.panel.panel-collapsed { padding-top: 10px; padding-bottom: 10px; }
 
 .setup { display: grid; gap: 14px; }
 .setup h2 { font-size: 20px; text-transform: none; letter-spacing: 0; color: var(--text); }
@@ -345,7 +359,24 @@ button.note-edit-btn svg { width: 16px; height: 16px; }
 .visual figcaption { display: grid; gap: 2px; }
 .visual-title { font-weight: 600; font-size: 14px; line-height: 1.35; }
 .lightbox { position: fixed; inset: 0; z-index: 50; background: #000c; display: grid; place-items: center; padding: 16px; }
-.lightbox-inner { max-width: min(960px, 100%); max-height: 100%; overflow: auto; background: var(--surface); border-radius: var(--radius); padding: 12px; display: grid; gap: 8px; }
-.lightbox-inner img, .lightbox-inner video { width: 100%; height: auto; max-height: 75vh; object-fit: contain; border-radius: 8px; background: #000; }
-.lightbox-inner p { margin: 0; }
-.lightbox-inner button { justify-self: end; }
+.lightbox-inner { width: min(1100px, 100%); max-height: 100%; overflow: auto; background: var(--surface); border-radius: var(--radius); padding: 12px; display: grid; gap: 8px; touch-action: pan-y; }
+.lightbox-stage { position: relative; display: grid; place-items: center; min-height: 200px; background: #000; border-radius: 8px; overflow: hidden; }
+.lightbox-stage img, .lightbox-stage video { width: 100%; height: auto; max-height: 75vh; object-fit: contain; display: block; user-select: none; -webkit-user-select: none; }
+.lightbox-msg { color: #ccc; padding: 40px 0; }
+button.gallery-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; min-height: 0; padding: 0; border-radius: 50%;
+  display: grid; place-items: center; border: 0; background: #000a; color: #fff;
+}
+button.gallery-nav:hover { background: #000d; }
+button.gallery-nav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.gallery-nav.prev { left: 8px; }
+.gallery-nav.next { right: 8px; }
+.lightbox-foot { display: flex; align-items: center; gap: 12px; }
+.lightbox-foot p { margin: 0; flex: 1; min-width: 0; }
+.gallery-count { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Note delete */
+.note-edit .push-right { margin-left: auto; }
+.confirm-row { align-items: center; }
+.confirm-row .small { flex: 1 1 100%; }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addNote, daysSince, noteEditText, parseNoteHead, parseStatus, replaceNote, setName, setStep, today } from './status';
+import { addNote, daysSince, deleteNote, noteEditText, noteHeadLine, parseNoteHead, parseStatus, replaceNote, setName, setStep, today } from './status';
 
 const SAMPLE = `---
 name: Recipe App
@@ -205,6 +205,18 @@ describe('note authors and editing', () => {
   it("refuses to edit Claude's notes or missing ones", () => {
     expect(replaceNote(md, 0, 'hacked')).toBeNull();
     expect(replaceNote(md, 5, 'x')).toBeNull();
+  });
+  it('deletes only your own notes, matched by their first line', () => {
+    const out = deleteNote(md, 1, noteHeadLine(md, 1)!)!;
+    expect(out).toContain('- 2026-11-07 (Claude): How to add\n  - Step one\n\n## Visuals');
+    expect(out).not.toContain('My idea');
+    expect(deleteNote(md, 0)).toBeNull();
+    // File changed under us: index now points elsewhere, but the head still finds the right note.
+    const shifted = addNote(md, 'Newer', '2026-11-09').replace('## Notes\n', '## Notes\n- 2026-11-01: First\n');
+    const out2 = deleteNote(shifted, 1, '- 2026-11-08: My idea')!;
+    expect(out2).toContain('- 2026-11-01: First\n- 2026-11-07 (Claude): How to add');
+    expect(out2).not.toContain('My idea');
+    expect(deleteNote(md, 1, '- 2026-11-08: Gone')).toBeNull();
   });
   it('adds Claude notes with the marker, and Notes goes before Visuals', () => {
     expect(addNote(md, 'From Claude', '2026-11-09', 'claude')).toContain('- 2026-11-09 (Claude): From Claude\n\n## Visuals');

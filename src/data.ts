@@ -4,7 +4,7 @@ import type { ColorName } from './colors';
 import { GitHubError, getFile, putFile } from './github';
 import { parseRegistry, projectPath, withColor, type RegistryEntry } from './registry';
 export { projectPath, type RegistryEntry };
-import { addNote as addNoteToText, parseStatus, replaceNote, setName, setStep, today, type ParsedStatus, type Step } from './status';
+import { addNote as addNoteToText, deleteNote, noteHeadLine, parseNoteHead, parseStatus, replaceNote, setName, setStep, today, type ParsedStatus, type Step } from './status';
 
 
 export interface Settings {
@@ -293,5 +293,23 @@ export function useProjects(settings: Settings) {
     [editFile],
   );
 
-  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote };
+  const removeNote = useCallback(
+    (id: string, index: number) => {
+      const raw = latest.current.find((p) => p.entry.id === id)?.raw;
+      const head = raw ? noteHeadLine(raw, index) ?? undefined : undefined;
+      const title = head ? parseNoteHead(head.replace(/^[-*+]\s+/, '')).title : 'note';
+      return editFile(
+        id,
+        (t) => {
+          const next = deleteNote(t, index, head);
+          if (next === null) throw new Error("That note has changed or isn't yours to delete. Refresh and try again.");
+          return next;
+        },
+        `dashboard: delete note "${title.slice(0, 50)}"`,
+      );
+    },
+    [editFile],
+  );
+
+  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote, deleteNote: removeNote };
 }

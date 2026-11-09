@@ -11,6 +11,7 @@ import { TitleEditor } from './TitleEditor';
 import { VisualsPanel, type MediaLoader } from './Visuals';
 import { NoteList } from './NoteList';
 import { StepItem } from './StepItem';
+import { Panel, useCollapsedSections } from './Panel';
 
 const SPECIAL = new Set(['summary', 'overview', 'visuals']);
 
@@ -22,6 +23,7 @@ export function ProjectDetail({
   onSetColor,
   onRename,
   onEditNote,
+  onDeleteNote,
   loadMedia,
   demo,
 }: {
@@ -32,10 +34,13 @@ export function ProjectDetail({
   onSetColor: (color: ColorName | null) => Promise<void>;
   onRename: (name: string) => Promise<void>;
   onEditNote: (index: number, text: string) => Promise<void>;
+  onDeleteNote: (index: number) => Promise<void>;
   loadMedia?: MediaLoader;
   demo: boolean;
 }) {
   const { status, entry } = project;
+  const sections = useCollapsedSections();
+  const fold = (title: string) => ({ collapsed: sections.isCollapsed(title), onToggle: () => sections.toggle(title) });
   const isNotes = (title: string) => title.trim().toLowerCase() === 'notes';
   const notesBody = status?.sections.find((s) => isNotes(s.title))?.body ?? '';
   const others = (status?.sections ?? []).filter((s) => !SPECIAL.has(s.title.trim().toLowerCase()) && !isNotes(s.title));
@@ -49,11 +54,7 @@ export function ProjectDetail({
       .trim();
     const done = steps.filter((x) => x.done).length;
     return (
-      <section key={s.title} className="panel">
-        <h2>
-          {s.title}
-          {steps.length > 0 && <Progress done={done} total={steps.length} />}
-        </h2>
+      <Panel key={s.title} title={s.title} {...fold(s.title)} extra={steps.length > 0 && <Progress done={done} total={steps.length} />}>
         {steps.length > 0 && (
           <ul className="steps">
             {[...steps.filter((x) => !x.done), ...steps.filter((x) => x.done)].map((x) => (
@@ -62,14 +63,30 @@ export function ProjectDetail({
           </ul>
         )}
         {rest && <Blocks body={rest} />}
-      </section>
+      </Panel>
     );
   };
+
+  // Every collapsible heading on this page, in order.
+  const titles = [
+    ...(status?.summary ? ['Summary'] : []),
+    ...others.filter(hasSteps).map((s) => s.title),
+    ...(status ? ['Notes', 'Visuals'] : []),
+    ...others.filter((s) => !hasSteps(s)).map((s) => s.title),
+  ];
+  const allCollapsed = titles.length > 0 && titles.every(sections.isCollapsed);
 
   const fileUrl = `https://github.com/${entry.repo}/blob/${entry.branch ?? 'HEAD'}/${projectPath(entry)}`;
   return (
     <div className="detail">
-      <button className="link back" onClick={onBack}>← All projects</button>
+      <div className="detail-nav">
+        <button className="link back" onClick={onBack}>← All projects</button>
+        {titles.length > 0 && (
+          <button className="link small" onClick={() => sections.setAll(titles, !allCollapsed)}>
+            {allCollapsed ? 'Expand all' : 'Collapse all'}
+          </button>
+        )}
+      </div>
       <header className="detail-head" style={entry.color ? { borderLeftColor: `var(--c-${entry.color})` } : undefined} data-colored={entry.color ? '' : undefined}>
         <TitleEditor name={displayName(project)} onRename={status ? onRename : undefined} />
         <div className="meta-row">
@@ -92,24 +109,22 @@ export function ProjectDetail({
       {status?.warnings.map((w) => <p key={w} className="warn small">⚠ {w}</p>)}
 
       {status?.summary && (
-        <section className="panel">
-          <h2>Summary</h2>
+        <Panel title="Summary" {...fold('Summary')}>
           <Blocks body={status.summary} />
-        </section>
+        </Panel>
       )}
 
       {/* Checklist sections first, then your notes, then everything else. */}
       {others.filter(hasSteps).map(renderSection)}
 
       {status && (
-        <section className="panel">
-          <h2>Notes</h2>
-          {notesBody ? <NoteList body={notesBody} raw={project.raw} onEdit={onEditNote} /> : <p className="muted small">Your notes. Add one here, or ask a Claude session to add one.</p>}
+        <Panel title="Notes" {...fold('Notes')}>
+          {notesBody ? <NoteList body={notesBody} raw={project.raw} onEdit={onEditNote} onDelete={onDeleteNote} /> : <p className="muted small">Your notes. Add one here, or ask a Claude session to add one.</p>}
           <NoteForm onAdd={onAddNote} />
-        </section>
+        </Panel>
       )}
 
-      {status && <VisualsPanel body={status.visuals} load={demo ? undefined : loadMedia} />}
+      {status && <VisualsPanel body={status.visuals} load={demo ? undefined : loadMedia} {...fold('Visuals')} />}
 
       {others.filter((s) => !hasSteps(s)).map(renderSection)}
       {status && status.sections.length === 0 && (

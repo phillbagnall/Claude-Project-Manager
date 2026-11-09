@@ -288,6 +288,34 @@ export function replaceNote(md: string, index: number, text: string): string | n
   return lines.join(eol);
 }
 
+/** The raw first line of note #index (used to make sure a delete hits the note you saw). */
+export function noteHeadLine(md: string, index: number): string | null {
+  const lines = md.split(/\r?\n/);
+  const range = noteRanges(lines)?.notes[index];
+  return range ? lines[range[0]] : null;
+}
+
+/**
+ * Delete one of the user's own notes. When `expectHead` is given, the note is found
+ * by that first line (so a changed file can't make it delete a different note).
+ * Returns null if the note is missing or isn't the user's.
+ */
+export function deleteNote(md: string, index: number, expectHead?: string): string | null {
+  const eol = md.includes('\r\n') ? '\r\n' : '\n';
+  const lines = md.split(/\r?\n/);
+  const r = noteRanges(lines);
+  if (!r) return null;
+  let range: [number, number] | undefined = r.notes[index];
+  if (expectHead !== undefined && (!range || lines[range[0]] !== expectHead)) {
+    const hits = r.notes.filter(([st]) => lines[st] === expectHead);
+    range = hits.length === 1 ? hits[0] : undefined;
+  }
+  if (!range) return null;
+  if (parseNoteHead(lines[range[0]].replace(/^[-*+]\s+/, '')).author !== 'user') return null;
+  lines.splice(range[0], range[1] - range[0]);
+  return lines.join(eol);
+}
+
 /** Local date as YYYY-MM-DD. */
 export function today(now = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0');
