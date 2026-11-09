@@ -98,7 +98,6 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD (Claude): text" (extra lines as indented sub-points), then commit and push.
   - When a session makes a visible change to a tracked project, add the 1-3 screenshots you already took that best show it to its ## Visuals section, as its CLAUDE.md describes. Don't open images just to describe them, and don't back-fill old ones unless I ask.
   ```
-- 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
 
 ## Visuals
 - 2026-11-07: Sign-in screen: connect the data repo and token, or try demo data
