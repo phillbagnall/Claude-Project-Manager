@@ -4,7 +4,7 @@ import type { ColorName } from './colors';
 import { GitHubError, getFile, putFile } from './github';
 import { parseRegistry, projectPath, withColor, type RegistryEntry } from './registry';
 export { projectPath, type RegistryEntry };
-import { addNote as addNoteToText, parseStatus, setName, setStep, today, type ParsedStatus, type Step } from './status';
+import { addNote as addNoteToText, parseStatus, replaceNote, setName, setStep, today, type ParsedStatus, type Step } from './status';
 
 
 export interface Settings {
@@ -279,5 +279,19 @@ export function useProjects(settings: Settings) {
     [editFile],
   );
 
-  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename };
+  const editNote = useCallback(
+    (id: string, index: number, text: string) =>
+      editFile(
+        id,
+        (t) => {
+          const next = replaceNote(t, index, text);
+          if (next === null) throw new Error("That note has changed or isn't yours to edit. Refresh and try again.");
+          return next;
+        },
+        `dashboard: edit note "${text.split('\n')[0].trim().slice(0, 50)}"`,
+      ),
+    [editFile],
+  );
+
+  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote };
 }

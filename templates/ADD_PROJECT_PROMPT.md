@@ -32,6 +32,7 @@ links: [https://github.com/phillbagnall/<name>]
 - [ ] ...
 ## Key info
 ## Notes
+## Visuals
 ## Decisions
 ## Log
 - YYYY-MM-DD: Added to the project dashboard

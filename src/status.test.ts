@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addNote, daysSince, parseStatus, setName, setStep, today } from './status';
+import { addNote, daysSince, noteEditText, parseNoteHead, parseStatus, replaceNote, setName, setStep, today } from './status';
 
 const SAMPLE = `---
 name: Recipe App
@@ -138,9 +138,9 @@ describe('splitNotes', () => {
   it('makes one note per top-level bullet with date, title and body', () => {
     const notes = splitNotes('- 2026-11-07: How to add\n  - Step one\n  - Step two\n- Plain note\n- 2026-11-08 - Dashed date');
     expect(notes).toEqual([
-      { date: '2026-11-07', title: 'How to add', body: '- Step one\n- Step two' },
-      { date: undefined, title: 'Plain note', body: '' },
-      { date: '2026-11-08', title: 'Dashed date', body: '' },
+      { date: '2026-11-07', author: 'user', index: 0, title: 'How to add', body: '- Step one\n- Step two' },
+      { author: 'user', index: 1, title: 'Plain note', body: '' },
+      { date: '2026-11-08', author: 'user', index: 2, title: 'Dashed date', body: '' },
     ]);
   });
 });
@@ -187,5 +187,45 @@ describe('setName', () => {
   });
   it('ignores blank names', () => {
     expect(setName(SAMPLE, '   ')).toBe(SAMPLE);
+  });
+});
+
+describe('note authors and editing', () => {
+  const md = '---\nname: X\n---\n## Notes\n- 2026-11-07 (Claude): How to add\n  - Step one\n- 2026-11-08: My idea\n  - detail a\n  - detail b\n\n## Visuals\n## Log\n- x\n';
+  it('reads the author marker', () => {
+    expect(parseNoteHead('2026-11-07 (Claude): Hi')).toEqual({ date: '2026-11-07', author: 'claude', title: 'Hi' });
+    expect(parseNoteHead('2026-11-07: Hi')).toEqual({ date: '2026-11-07', author: 'user', title: 'Hi' });
+    expect(splitNotes(parseStatus(md).notes).map((n) => n.author)).toEqual(['claude', 'user']);
+  });
+  it('shows a note for editing and replaces only that note, keeping its date', () => {
+    expect(noteEditText(md, 1)).toBe('My idea\ndetail a\ndetail b');
+    const out = replaceNote(md, 1, 'My better idea\ndetail c')!;
+    expect(out).toContain('- 2026-11-07 (Claude): How to add\n  - Step one\n- 2026-11-08: My better idea\n  - detail c\n\n## Visuals');
+  });
+  it("refuses to edit Claude's notes or missing ones", () => {
+    expect(replaceNote(md, 0, 'hacked')).toBeNull();
+    expect(replaceNote(md, 5, 'x')).toBeNull();
+  });
+  it('adds Claude notes with the marker, and Notes goes before Visuals', () => {
+    expect(addNote(md, 'From Claude', '2026-11-09', 'claude')).toContain('- 2026-11-09 (Claude): From Claude\n\n## Visuals');
+    const noNotes = '---\nname: X\n---\n## Summary\nx\n## Visuals\n## Log\n';
+    expect(addNote(noNotes, 'Hi', '2026-11-09')).toContain('## Notes\n- 2026-11-09: Hi\n\n## Visuals');
+  });
+  it('keeps code blocks intact when adding or editing', () => {
+    const out = addNote(md, 'Prompt\n```text\nline one\n\n- [ ] not a step\n```', '2026-11-09');
+    expect(out).toContain('- 2026-11-09: Prompt\n  ```text\n  line one\n\n  - [ ] not a step\n  ```');
+    expect(parseStatus(out).steps).toHaveLength(0);
+    expect(noteEditText(out, 2)).toBe('Prompt\n```text\nline one\n\n- [ ] not a step\n```');
+  });
+});
+
+import { parseVisuals } from './components/Visuals';
+describe('parseVisuals', () => {
+  it('reads description, build, images and videos', () => {
+    const md = '- 2026-11-09: Login screen\n  - Build: v0.4.1 (abc1234)\n  - ![Login](docs/visuals/login.png)\n  - Shows the error state\n- 2026-11-10: Walkthrough clip\n  - Build: after onboarding\n  - [video](docs/visuals/walk.mp4)\n  - File: docs/visuals/extra.webp';
+    const v = parseVisuals(md);
+    expect(v[0]).toEqual({ date: '2026-11-09', title: 'Login screen', build: 'v0.4.1 (abc1234)', media: [{ label: 'Login', src: 'docs/visuals/login.png', kind: 'image' }], extra: '- Shows the error state' });
+    expect(v[1].media.map((m) => m.kind)).toEqual(['video', 'image']);
+    expect(v[1].build).toBe('after onboarding');
   });
 });

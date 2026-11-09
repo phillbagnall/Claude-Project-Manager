@@ -14,10 +14,18 @@ Keep it accurate — it's how progress is seen without scrolling back through ch
   move long-finished items out once there are more than ~5 done.
 - `## Key info`: facts the user would otherwise hunt for (URLs, service names, where secrets live —
   never the secrets themselves).
-- `## Notes`: notes from the user, added on the dashboard or by asking you. Read them (they may
-  hold instructions or context). When the user asks you to add a note, append it to the end of
-  this section as `- YYYY-MM-DD: text` (extra lines as indented `  - ` sub-points). Never edit,
-  reorder or delete existing notes unless the user explicitly asks you to.
+- `## Notes`: notes from the user (added on the dashboard) and from you. Read them (they may hold
+  instructions or context). When the user asks you to add a note, append it to the end of this
+  section as `- YYYY-MM-DD (Claude): text` (extra lines as indented `  - ` sub-points); the
+  "(Claude)" marker shows it's yours. Notes without it are the user's. Never edit, reorder or
+  delete existing notes unless the user explicitly asks you to.
+- `## Visuals`: screenshots and screen recordings you make of the project (e.g. when checking a UI
+  change). Upload every one you make unless the user says otherwise: save it in `docs/visuals/` as
+  `YYYY-MM-DD-short-name.png` (PNG/JPG/WebP/GIF; MP4/WebM for video; keep each under ~10 MB and
+  compress videos), then append an entry:
+  `- YYYY-MM-DD: what it shows`, then indented `  - Build: <version or short commit — what stage>`
+  and `  - ![short description](docs/visuals/file.png)` (for video: `[video](docs/visuals/file.mp4)`).
+  Paths are relative to PROJECT_STATUS.md. Newest last.
 - `## Decisions`: one dated line per significant decision, with the reason.
 - `## Log`: append one dated line per session.
 - Keep `name:` as it is unless the user asks you to change it; they may rename projects on the
@@ -43,6 +51,7 @@ links: [https://github.com/owner/repo]
 - [ ] …
 ## Key info
 ## Notes
+## Visuals
 ## Decisions
 ## Log
 ```

@@ -5,6 +5,8 @@ import { ProjectDetail } from './components/ProjectDetail';
 import { Setup } from './components/Setup';
 import { loadSettings, saveSettings, useProjects, type Project, type Settings } from './data';
 import { PHASES, isBlocked } from './status';
+import { getRawBlob } from './github';
+import { projectPath } from './data';
 
 type Route = { view: 'overview' } | { view: 'actions' } | { view: 'project'; id: string };
 type Sort = 'priority' | 'updated' | 'name';
@@ -54,7 +56,7 @@ export function App() {
   const [route, setRoute] = useState<Route>(parseHash);
   const [showSettings, setShowSettings] = useState(false);
   const [prefs, setPrefs] = useState<ViewPrefs>(loadPrefs);
-  const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename } = useProjects(settings);
+  const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote } = useProjects(settings);
 
   useEffect(() => {
     const on = () => {
@@ -207,13 +209,29 @@ export function App() {
 
         {route.view === 'project' &&
           (current ? (
-            <ProjectDetail project={current} demo={settings.demo} onBack={() => go('/')} onToggle={(s, d) => toggleStep(current.entry.id, s, d)} onAddNote={(n) => addNote(current.entry.id, n)} onSetColor={(c) => setColor(current.entry.id, c)} onRename={(n) => rename(current.entry.id, n)} />
+            <ProjectDetail project={current} demo={settings.demo} onBack={() => go('/')} onToggle={(s, d) => toggleStep(current.entry.id, s, d)} onAddNote={(n) => addNote(current.entry.id, n)} onSetColor={(c) => setColor(current.entry.id, c)} onRename={(n) => rename(current.entry.id, n)} onEditNote={(i, t) => editNote(current.entry.id, i, t)}
+              loadMedia={(path) => loadMedia(settings.token, current.entry.repo, path, current.entry.branch, projectPath(current.entry))}
+            />
           ) : (
             <p className="empty">{refreshing ? 'Loading…' : <>Project not found. <button className="link" onClick={() => go('/')}>Back</button></>}</p>
           ))}
       </main>
     </div>
   );
+}
+
+const mediaCache = new Map<string, Promise<string>>();
+/** Fetch a repo file once and keep an object URL for it. Paths are relative to the status file's folder. */
+function loadMedia(token: string, repo: string, path: string, branch: string | undefined, statusPath: string): Promise<string> {
+  const dir = statusPath.includes('/') ? statusPath.slice(0, statusPath.lastIndexOf('/') + 1) : '';
+  const full = path.startsWith('/') ? path.slice(1) : dir + path;
+  const key = `${repo}@${branch ?? ''}:${full}`;
+  if (!mediaCache.has(key)) {
+    const p = getRawBlob(token, repo, full, branch).then((b) => URL.createObjectURL(b));
+    p.catch(() => mediaCache.delete(key));
+    mediaCache.set(key, p);
+  }
+  return mediaCache.get(key)!;
 }
 
 function Brand() {

@@ -321,3 +321,31 @@ button.rename:hover { color: var(--text); }
   width: 100%; font-size: 22px; font-weight: 700; padding: 0.3em 0.5em; min-height: 48px;
   border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: inherit;
 }
+
+/* Note authors + editing */
+.author { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; }
+.author svg { width: 14px; height: 14px; }
+.author.claude { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.author.claude svg { fill: var(--accent); }
+.author.user { background: var(--surface-2); }
+.author.user svg { fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; }
+button.note-edit-btn { width: 28px; height: 28px; min-height: 0; margin: -3px -4px -3px 0; border: 0; background: none; color: var(--muted); }
+button.note-edit-btn svg { width: 16px; height: 16px; }
+.note-card.editing { padding: 10px 12px; }
+.note-edit { display: grid; gap: 6px; }
+.note-edit textarea { width: 100%; resize: vertical; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: inherit; font: inherit; padding: 0.5em 0.65em; }
+
+/* Visuals */
+.visual-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.visual { margin: 0; display: grid; gap: 6px; align-content: start; }
+.visual-thumb { aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; }
+.thumb-btn { position: relative; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 0; background: none; }
+.thumb-btn img, .thumb-btn video { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.play { position: absolute; inset: 0; display: grid; place-items: center; font-size: 28px; color: #fff; text-shadow: 0 1px 6px #0009; }
+.visual figcaption { display: grid; gap: 2px; }
+.visual-title { font-weight: 600; font-size: 14px; line-height: 1.35; }
+.lightbox { position: fixed; inset: 0; z-index: 50; background: #000c; display: grid; place-items: center; padding: 16px; }
+.lightbox-inner { max-width: min(960px, 100%); max-height: 100%; overflow: auto; background: var(--surface); border-radius: var(--radius); padding: 12px; display: grid; gap: 8px; }
+.lightbox-inner img, .lightbox-inner video { width: 100%; height: auto; max-height: 75vh; object-fit: contain; border-radius: 8px; background: #000; }
+.lightbox-inner p { margin: 0; }
+.lightbox-inner button { justify-self: end; }

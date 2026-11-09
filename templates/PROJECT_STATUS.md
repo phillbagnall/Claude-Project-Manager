@@ -18,6 +18,9 @@ links: []              # repo, live site, Claude session URLs…
 ## Notes
 - Your notes: add them with the dashboard's Add note box, or ask Claude to add one
 
+## Visuals
+- Screenshots and videos Claude makes appear here (files in docs/visuals/)
+
 ## Decisions
 - YYYY-MM-DD: What was decided and why
 

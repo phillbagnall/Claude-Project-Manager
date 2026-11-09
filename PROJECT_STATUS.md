@@ -2,7 +2,7 @@
 name: Claude Project Manager
 phase: Testing
 priority: high
-updated: 2026-11-08
+updated: 2026-11-09
 blocked: false
 links: [https://github.com/phillbagnall/Claude-Project-Manager]
 ---
@@ -29,19 +29,19 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - The token has access to **all repositories**, so new projects only need adding to projects.json (no token changes)
 
 ## Notes
-- 2026-11-07: How to add another project to the dashboard
+- 2026-11-07 (Claude): How to add another project to the dashboard
   - Easiest: in a Claude session on that repo, say "Set this repo up for my project tracker". Claude writes PROJECT_STATUS.md and the CLAUDE.md section, and adds the repo to projects.json (attach project-tracker-data to the session too)
   - By hand: copy `templates/PROJECT_STATUS.md` into the repo root and paste `templates/CLAUDE.md.snippet` into its CLAUDE.md
   - Add a line to `projects.json` in project-tracker-data: `{ "id": "my-project", "repo": "phillbagnall/my-project" }`
   - Tap ↻ on the dashboard
   - No repo (e.g. Cowork work)? Add `projects/<name>.md` to project-tracker-data, with `"path": "projects/<name>.md"` in its projects.json entry
-- 2026-11-07: How to add a new chat to the dashboard
+- 2026-11-07 (Claude): How to add a new chat to the dashboard
   - Claude Code session (web, mobile or desktop) on a repo that's already tracked: nothing to do. The repo's CLAUDE.md tells it to keep PROJECT_STATUS.md updated
   - New Claude Code session on an untracked repo: say "Set this repo up for my project tracker", then follow the "add another project" note above (adds it to projects.json)
-  - Ask any session to "add a note" and it appends a dated note to that project's Notes. It never edits or deletes existing notes unless you ask
+  - Ask any session to "add a note" and it appends a dated note, marked as Claude's, to that project's Notes. It never edits or deletes existing notes unless you ask
   - Ordinary claude.ai chat (no repo): ask it to "write a PROJECT_STATUS.md for this chat in the dashboard format". On GitHub, add it to project-tracker-data as `projects/<name>.md`, then add `{ "id": "<name>", "repo": "phillbagnall/project-tracker-data", "path": "projects/<name>.md" }` to projects.json. To update it later, ask the chat for a fresh version and paste it over the old one
   - Cowork: same as a claude.ai chat, but Cowork can edit `projects/<name>.md` directly in a local clone of project-tracker-data and push it
-- 2026-11-07: Prompt for adding a PC project (no repo yet)
+- 2026-11-07 (Claude): Prompt for adding a PC project (no repo yet)
   - Open a Claude Code chat in the project's folder on your PC, tap Copy below and paste it in. Afterwards just tap ↻
   - Same text as `templates/ADD_PROJECT_PROMPT.md`; if one changes, update the other
   ```text
@@ -70,6 +70,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   - [ ] ...
   ## Key info
   ## Notes
+  ## Visuals
   ## Decisions
   ## Log
   - YYYY-MM-DD: Added to the project dashboard
@@ -80,7 +81,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 
   8. Finish by giving me the repo URL and telling me to tap refresh on the dashboard. (My dashboard token has access to all my repos, so nothing else is needed.)
   ```
-- 2026-11-07: Global instruction for Claude Code on your PC
+- 2026-11-07 (Claude): Global instruction for Claude Code on your PC
   - Makes every new Claude Code chat on your PC offer to add an untracked project to the dashboard (answer yes, not now, or never)
   - Tap Copy and paste it at the end of `C:\Users\<you>\.claude\CLAUDE.md` (create the file if it doesn't exist). Only Claude Code on that PC reads it
   - Same text as `templates/GLOBAL_CLAUDE.md`; if one changes, update the other
@@ -94,7 +95,8 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
     - Yes: follow the steps in https://raw.githubusercontent.com/phillbagnall/Claude-Project-Manager/main/templates/ADD_PROJECT_PROMPT.md (the text block in that file).
     - Not now: don't ask again this session.
     - Never: create an empty file named .no-dashboard in the project root and commit it. Never ask in a folder that has that file.
-  - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD: text" (extra lines as indented sub-points), then commit and push.
+  - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD (Claude): text" (extra lines as indented sub-points), then commit and push.
+  - Upload every screenshot or video you make of a tracked project to its ## Visuals section, as its CLAUDE.md describes, unless I say otherwise.
   ```
 - 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
 - 2026-11-08: Add section for visuals created by Claude, such as screenshots or video, along with a brief description and where in the build the snapshot is from. Upload all unless otherwise specified by the user. If possible, upload previous content from before the project manager was created.
@@ -105,6 +107,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-09: Note authors (Claude/you icons), edit your own notes, and a Visuals gallery for Claude's screenshots/videos
 - 2026-11-08: Token now covers all repositories; removed 'add the repo to your token' steps from notes, prompt and README
 - 2026-11-08: Rename projects from their page (✏️ next to the title)
 - 2026-11-08: Tile colours also shown on the Open actions tab

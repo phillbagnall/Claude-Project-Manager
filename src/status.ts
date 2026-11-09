@@ -37,6 +37,8 @@ export interface ParsedStatus {
   keyInfo: string[];
   /** Raw markdown of the user's `## Notes` section. */
   notes: string;
+  /** Raw markdown of the `## Visuals` section (screenshots/videos from Claude). */
+  visuals: string;
   decisions: string[];
   log: string[];
   /** Every section in file order, for the detail view. */
@@ -140,6 +142,7 @@ export function parseStatus(md: string): ParsedStatus {
     steps,
     keyInfo: bullets(find('key info', 'key information')),
     notes: find('notes'),
+    visuals: find('visuals'),
     decisions: bullets(find('decisions')),
     log: bullets(find('log', 'changelog', 'history')),
     sections,
@@ -178,23 +181,68 @@ export function isBlocked(meta: StatusMeta): boolean {
   return meta.blocked === true || meta.blocked === 'true' || meta.blocked === 'yes';
 }
 
-const SECTIONS_AFTER_NOTES = ['decisions', 'log', 'changelog', 'history'];
+const SECTIONS_AFTER_NOTES = ['visuals', 'decisions', 'log', 'changelog', 'history'];
+
+export type NoteAuthor = 'user' | 'claude';
+
+/** "2026-11-09 (Claude): Title" → date, author, title. Unmarked notes are the user's. */
+export function parseNoteHead(text: string): { date?: string; author: NoteAuthor; title: string } {
+  const m = text.match(/^(\d{4}-\d{2}-\d{2})(?:\s*\((claude|you|user)\))?\s*[:\-–]\s*(.*)$/i);
+  if (!m) return { author: 'user', title: text.trim() };
+  return { date: m[1], author: m[2]?.toLowerCase() === 'claude' ? 'claude' : 'user', title: m[3].trim() };
+}
+
+/**
+ * Turn typed note text into file lines. First line is the title; with a code
+ * block (```), the rest is kept verbatim (indented); otherwise each extra line
+ * becomes a sub-point.
+ */
+function formatNote(head: string, text: string): string[] {
+  const all = text.split(/\r?\n/);
+  const firstIdx = all.findIndex((l) => l.trim());
+  if (firstIdx === -1) return [];
+  const first = all[firstIdx].trim();
+  const rest = all.slice(firstIdx + 1);
+  while (rest.length && !rest[rest.length - 1].trim()) rest.pop();
+  const raw = rest.some((l) => /^\s*(```|~~~)/.test(l));
+  const body = raw
+    ? rest.map((l) => (l.trim() ? `  ${l}` : ''))
+    : rest.map((l) => l.trim()).filter(Boolean).map((l) => `  - ${l.replace(/^[-*+]\s+/, '')}`);
+  return [`- ${head}: ${first}`, ...body];
+}
+
+/** Line ranges [start, end) of each top-level note in the Notes section (code blocks respected). */
+function noteRanges(lines: string[]): { section: number; end: number; notes: [number, number][] } | null {
+  const fenced = fenceMask(lines);
+  const headingAt = (i: number) => (fenced[i] ? undefined : lines[i]?.match(HEADING)?.[1]);
+  const section = lines.findIndex((_, i) => normalise(headingAt(i) ?? '') === 'notes');
+  if (section === -1) return null;
+  let end = section + 1;
+  while (end < lines.length && !headingAt(end)) end++;
+  const starts: number[] = [];
+  for (let i = section + 1; i < end; i++) if (!fenced[i] && /^[-*+]\s+/.test(lines[i])) starts.push(i);
+  const notes = starts.map((st, k): [number, number] => {
+    let e = k + 1 < starts.length ? starts[k + 1] : end;
+    while (e > st + 1 && !lines[e - 1].trim()) e--;
+    return [st, e];
+  });
+  return { section, end, notes };
+}
 
 /**
  * Append a dated note to the `## Notes` section, creating the section (before
- * Decisions/Log, or at the end) if needed. Extra lines become indented sub-bullets.
+ * Visuals/Decisions/Log, or at the end) if needed.
  */
-export function addNote(md: string, note: string, date: string): string {
+export function addNote(md: string, note: string, date: string, author: NoteAuthor = 'user'): string {
   const eol = md.includes('\r\n') ? '\r\n' : '\n';
   const lines = md.split(/\r?\n/);
-  const [first, ...rest] = note.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  if (!first) return md;
-  const entry = [`- ${date}: ${first}`, ...rest.map((l) => `  - ${l.replace(/^[-*+]\s+/, '')}`)];
+  const entry = formatNote(author === 'claude' ? `${date} (Claude)` : date, note);
+  if (!entry.length) return md;
 
-  const fenced = fenceMask(lines);
-  const headingAt = (i: number) => (fenced[i] ? undefined : lines[i]?.match(HEADING)?.[1]);
-  const notesIdx = lines.findIndex((_, i) => normalise(headingAt(i) ?? '') === 'notes');
-  if (notesIdx === -1) {
+  const r = noteRanges(lines);
+  if (!r) {
+    const fenced = fenceMask(lines);
+    const headingAt = (i: number) => (fenced[i] ? undefined : lines[i]?.match(HEADING)?.[1]);
     const insertAt = lines.findIndex((_, i) => SECTIONS_AFTER_NOTES.includes(normalise(headingAt(i) ?? '-')));
     if (insertAt === -1) {
       while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
@@ -204,12 +252,39 @@ export function addNote(md: string, note: string, date: string): string {
     }
     return lines.join(eol);
   }
-  // Append at the end of the Notes section (before the next heading), skipping trailing blank lines.
-  let end = notesIdx + 1;
-  while (end < lines.length && !headingAt(end)) end++;
-  let insert = end;
-  while (insert > notesIdx + 1 && lines[insert - 1].trim() === '') insert--;
+  // Append at the end of the Notes section, skipping trailing blank lines.
+  let insert = r.end;
+  while (insert > r.section + 1 && lines[insert - 1].trim() === '') insert--;
   lines.splice(insert, 0, ...entry);
+  return lines.join(eol);
+}
+
+/** The text to show when editing note #index: title, then its sub-points (or raw body if it has a code block). */
+export function noteEditText(md: string, index: number): string | null {
+  const lines = md.split(/\r?\n/);
+  const range = noteRanges(lines)?.notes[index];
+  if (!range) return null;
+  const head = parseNoteHead(lines[range[0]].replace(/^[-*+]\s+/, ''));
+  const body = lines.slice(range[0] + 1, range[1]).map((l) => l.replace(/^ {2}/, ''));
+  const raw = body.some((l) => /^\s*(```|~~~)/.test(l));
+  const shown = raw ? body : body.filter((l) => l.trim()).map((l) => l.replace(/^[-*+]\s+/, ''));
+  return [head.title, ...shown].join('\n');
+}
+
+/**
+ * Replace note #index with new text, keeping its date and author. Only the user's
+ * own notes may be edited; returns null if the note is missing or isn't theirs.
+ */
+export function replaceNote(md: string, index: number, text: string): string | null {
+  const eol = md.includes('\r\n') ? '\r\n' : '\n';
+  const lines = md.split(/\r?\n/);
+  const range = noteRanges(lines)?.notes[index];
+  if (!range) return null;
+  const head = parseNoteHead(lines[range[0]].replace(/^[-*+]\s+/, ''));
+  if (head.author !== 'user') return null;
+  const entry = formatNote(head.date ?? today(), text);
+  if (!entry.length) return null;
+  lines.splice(range[0], range[1] - range[0], ...entry);
   return lines.join(eol);
 }
 

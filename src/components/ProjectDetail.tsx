@@ -8,10 +8,11 @@ import type { ColorName } from '../colors';
 import { ColorPicker } from './ColorPicker';
 import { NoteForm } from './NoteForm';
 import { TitleEditor } from './TitleEditor';
+import { VisualsPanel, type MediaLoader } from './Visuals';
 import { NoteList } from './NoteList';
 import { StepItem } from './StepItem';
 
-const SPECIAL = new Set(['summary', 'overview']);
+const SPECIAL = new Set(['summary', 'overview', 'visuals']);
 
 export function ProjectDetail({
   project,
@@ -20,6 +21,8 @@ export function ProjectDetail({
   onAddNote,
   onSetColor,
   onRename,
+  onEditNote,
+  loadMedia,
   demo,
 }: {
   project: Project;
@@ -28,6 +31,8 @@ export function ProjectDetail({
   onAddNote: (note: string) => Promise<void>;
   onSetColor: (color: ColorName | null) => Promise<void>;
   onRename: (name: string) => Promise<void>;
+  onEditNote: (index: number, text: string) => Promise<void>;
+  loadMedia?: MediaLoader;
   demo: boolean;
 }) {
   const { status, entry } = project;
@@ -99,10 +104,12 @@ export function ProjectDetail({
       {status && (
         <section className="panel">
           <h2>Notes</h2>
-          {notesBody ? <NoteList body={notesBody} /> : <p className="muted small">Your notes. Add one here, or ask a Claude session to add one.</p>}
+          {notesBody ? <NoteList body={notesBody} raw={project.raw} onEdit={onEditNote} /> : <p className="muted small">Your notes. Add one here, or ask a Claude session to add one.</p>}
           <NoteForm onAdd={onAddNote} />
         </section>
       )}
+
+      {status && <VisualsPanel body={status.visuals} load={demo ? undefined : loadMedia} />}
 
       {others.filter((s) => !hasSteps(s)).map(renderSection)}
       {status && status.sections.length === 0 && (

@@ -64,13 +64,22 @@ links: [https://github.com/phillbagnall/recipe-app]
 - [x] Database schema
 ## Key info
 ## Notes
+## Visuals
 ## Decisions
 ## Log
 ```
 
 The tile's name is the `name:` line. Rename a project with the ✏️ next to its title on its page; this changes only that line. Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
 
-`## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, but never edit or delete existing ones unless you say so.
+`## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, marked `(Claude)` (`- 2026-11-09 (Claude): …`). On the dashboard each note shows who wrote it, and you can edit your own notes (✏️) but not Claude's.
+
+`## Visuals` holds screenshots and videos Claude makes while building, each with a description and the build it's from. The files live in the project repo's `docs/visuals/`, and the dashboard shows them as a gallery (tap one for full size). Entries look like:
+
+```markdown
+- 2026-11-09: Login screen, first working version
+  - Build: v0.4.1 (a1b2c3d), after the auth work
+  - ![Login screen](docs/visuals/2026-11-09-login.png)
+```
 
 ## Custom domain (optional)
 

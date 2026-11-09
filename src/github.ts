@@ -90,3 +90,17 @@ export async function putFile(
   });
   return data.content.sha as string;
 }
+
+/** Download a file's raw bytes (images/videos) — works for private repos, up to 100 MB. */
+export async function getRawBlob(token: string, repo: string, path: string, ref?: string): Promise<Blob> {
+  const q = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+  const res = await fetch(`${API}/repos/${repo}/contents/${encPath(path)}${q}`, {
+    headers: {
+      Accept: 'application/vnd.github.raw',
+      Authorization: `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  if (!res.ok) throw new GitHubError(res.status, res.status === 404 ? `${path} not found` : res.statusText);
+  return res.blob();
+}
