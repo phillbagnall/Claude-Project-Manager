@@ -165,6 +165,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-09: Did the 2026-11-09 to-do: collapsible project sections (Collapse all / Expand all), gallery navigation in Visuals (arrow keys, swipe, on-screen arrows), full-width layout on desktop, and deleting your own notes
 - 2026-11-09: Softened the Visuals rule (1-3 per visible change, no opening images just to describe them, no back-fill unless asked) to save usage
 - 2026-11-09: Added 15 screenshots from building the dashboard to Visuals
 - 2026-11-09: Note authors (Claude/you icons), edit your own notes, and a Visuals gallery for Claude's screenshots/videos
