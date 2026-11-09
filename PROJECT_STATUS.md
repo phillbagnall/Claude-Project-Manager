@@ -99,7 +99,6 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
   - When a session makes a visible change to a tracked project, add the 1-3 screenshots you already took that best show it to its ## Visuals section, as its CLAUDE.md describes. Don't open images just to describe them, and don't back-fill old ones unless I ask.
   ```
 - 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
-- 2026-11-08: Add section for visuals created by Claude, such as screenshots or video, along with a brief description and where in the build the snapshot is from. Upload all unless otherwise specified by the user. If possible, upload previous content from before the project manager was created.
 
 ## Visuals
 - 2026-11-07: Sign-in screen: connect the data repo and token, or try demo data
