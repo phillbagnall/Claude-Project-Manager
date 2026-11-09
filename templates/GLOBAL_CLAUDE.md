@@ -21,5 +21,5 @@ I track my projects on a dashboard (https://github.com/phillbagnall/Claude-Proje
   - Not now: don't ask again this session.
   - Never: create an empty file named .no-dashboard in the project root and commit it. Never ask in a folder that has that file.
 - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD (Claude): text" (extra lines as indented sub-points), then commit and push.
-- Upload every screenshot or video you make of a tracked project to its ## Visuals section, as its CLAUDE.md describes, unless I say otherwise.
+- When a session makes a visible change to a tracked project, add the 1-3 screenshots you already took that best show it to its ## Visuals section, as its CLAUDE.md describes. Don't open images just to describe them, and don't back-fill old ones unless I ask.
 ```

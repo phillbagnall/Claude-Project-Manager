@@ -73,7 +73,7 @@ The tile's name is the `name:` line. Rename a project with the ✏️ next to it
 
 `## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, marked `(Claude)` (`- 2026-11-09 (Claude): …`). On the dashboard each note shows who wrote it, and you can edit your own notes (✏️) but not Claude's.
 
-`## Visuals` holds screenshots and videos Claude makes while building, each with a description and the build it's from. The files live in the project repo's `docs/visuals/`, and the dashboard shows them as a gallery (tap one for full size). Entries look like:
+`## Visuals` holds a few screenshots or videos per visible change (1-3 per session, from images Claude already took), each with a description and the build it's from. Sessions don't open images just to describe them or back-fill old ones unless asked, which keeps usage low. The files live in the project repo's `docs/visuals/`, and the dashboard shows them as a gallery (tap one for full size). Entries look like:
 
 ```markdown
 - 2026-11-09: Login screen, first working version

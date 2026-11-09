@@ -96,7 +96,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
     - Not now: don't ask again this session.
     - Never: create an empty file named .no-dashboard in the project root and commit it. Never ask in a folder that has that file.
   - When I ask you to "add a note", append it to the ## Notes section of PROJECT_STATUS.md as "- YYYY-MM-DD (Claude): text" (extra lines as indented sub-points), then commit and push.
-  - Upload every screenshot or video you make of a tracked project to its ## Visuals section, as its CLAUDE.md describes, unless I say otherwise.
+  - When a session makes a visible change to a tracked project, add the 1-3 screenshots you already took that best show it to its ## Visuals section, as its CLAUDE.md describes. Don't open images just to describe them, and don't back-fill old ones unless I ask.
   ```
 - 2026-11-08: Add the ability to edit user made notes, but not Claude notes. Put a Claude logo on Claude created notes, and a user icon on user created ones.
 - 2026-11-08: Add section for visuals created by Claude, such as screenshots or video, along with a brief description and where in the build the snapshot is from. Upload all unless otherwise specified by the user. If possible, upload previous content from before the project manager was created.
@@ -159,6 +159,7 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-09: Softened the Visuals rule (1-3 per visible change, no opening images just to describe them, no back-fill unless asked) to save usage
 - 2026-11-09: Added 15 screenshots from building the dashboard to Visuals
 - 2026-11-09: Note authors (Claude/you icons), edit your own notes, and a Visuals gallery for Claude's screenshots/videos
 - 2026-11-08: Token now covers all repositories; removed 'add the repo to your token' steps from notes, prompt and README
