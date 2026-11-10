@@ -71,7 +71,7 @@ links: [https://github.com/phillbagnall/recipe-app]
 
 The tile's name is the `name:` line. Rename a project with the ✏️ next to its title on its page; this changes only that line. Checkboxes under any `##` heading are shown and can be ticked. Unknown sections still appear on the project page.
 
-`## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, marked `(Claude)` (`- 2026-11-09 (Claude): …`). On the dashboard each note shows who wrote it, and you can edit your own notes (✏️) but not Claude's.
+`## Notes` is yours. Add one with the **Add note** box on a project's page, which appends a dated bullet there (extra lines become sub-points) and commits it, or ask a Claude session to "add a note". Claude sessions read the notes and append new ones when asked, marked `(Claude)` (`- 2026-11-09 (Claude): …`). On the dashboard each note shows who wrote it, and you can edit or delete your own notes (✏️) but not Claude's.
 
 `## Visuals` holds a few screenshots or videos per visible change (1-3 per session, from images Claude already took), each with a description and the build it's from. Sessions don't open images just to describe them or back-fill old ones unless asked, which keeps usage low. The files live in the project repo's `docs/visuals/`, and the dashboard shows them as a gallery (tap one for full size). Entries look like:
 
@@ -80,6 +80,20 @@ The tile's name is the `name:` line. Rename a project with the ✏️ next to it
   - Build: v0.4.1 (a1b2c3d), after the auth work
   - ![Login screen](docs/visuals/2026-11-09-login.png)
 ```
+
+## Ideas
+
+The **Ideas** tab holds ideas for future projects: a title and optional notes. They're saved in `ideas.md` in the data repo, next to `projects.json`, so they stay private and any Claude session with access can read them. Each `## heading` is one idea:
+
+```markdown
+## Bird feeder camera
+Added: 2026-11-10
+
+Raspberry Pi camera on the feeder.
+- auto-tag species
+```
+
+When you're ready, open an idea and tap **Promote to project**. The dashboard creates `projects/<id>.md` in the data repo (phase Planning, your notes kept), adds it to `projects.json`, removes it from Ideas and opens the new project. Its Notes include a kick-off prompt with a Copy button. Paste that into a new Claude Code session in an empty folder, and Claude plans the project with you, creates its private repo, moves the status file into it and updates `projects.json`.
 
 ## Custom domain (optional)
 

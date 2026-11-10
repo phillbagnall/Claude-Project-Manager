@@ -126,7 +126,9 @@ button.icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; s
   border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: 14px;
 }
 
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 4px 0 14px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 4px 0 14px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { white-space: nowrap; }
 .tabs button {
   border: 0; background: none; border-radius: 0; padding: 10px 12px;
   color: var(--muted); font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -375,6 +377,29 @@ button.gallery-nav svg { width: 22px; height: 22px; fill: none; stroke: currentC
 .lightbox-foot { display: flex; align-items: center; gap: 12px; }
 .lightbox-foot p { margin: 0; flex: 1; min-width: 0; }
 .gallery-count { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Ideas */
+.ideas { display: grid; gap: 12px; }
+.idea-form { display: grid; gap: 8px; }
+.idea-form input, .idea-form textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+  padding: 0.6em 0.75em; font: inherit; color: inherit;
+}
+.idea-form input { min-height: 44px; font-weight: 600; }
+.idea-form textarea { resize: vertical; min-height: 72px; }
+.idea-card { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
+.idea-card summary { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; list-style: none; cursor: pointer; border-radius: 10px; }
+.idea-card summary::-webkit-details-marker { display: none; }
+.idea-card summary:hover { background: var(--surface-2); }
+.idea-card[open] .chev { transform: rotate(90deg); }
+.idea-card[open] summary { border-bottom: 1px solid var(--border); border-radius: 10px 10px 0 0; }
+.idea-card .note-body { padding: 8px 14px 12px; }
+.idea-card.editing { padding: 12px 14px; }
+.idea-bulb { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; background: color-mix(in srgb, var(--c-amber) 22%, transparent); }
+.idea-bulb svg { width: 14px; height: 14px; fill: none; stroke: var(--c-amber); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.idea-actions, .idea-confirm { margin-top: 10px; }
+.idea-actions .push-right { margin-left: auto; }
+.idea-confirm { border-top: 1px dashed var(--border); padding-top: 8px; }
 
 /* Note delete */
 .note-edit .push-right { margin-left: auto; }

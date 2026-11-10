@@ -50,6 +50,15 @@ export function parseRegistry(text: string): RegistryEntry[] {
   return out;
 }
 
+/** Return projects.json text with a new entry appended. Throws if its id is already used. */
+export function withEntry(text: string, entry: Omit<RegistryEntry, 'color'>): string {
+  const { json, list } = rawList(text);
+  if (idsFor(list).includes(entry.id)) throw new Error(`"${entry.id}" is already in projects.json.`);
+  const newList = [...list, entry];
+  const out = Array.isArray(json) ? newList : { ...(json as object), projects: newList };
+  return JSON.stringify(out, null, 2) + '\n';
+}
+
 /**
  * Return projects.json text with one entry's colour set (or removed when null),
  * keeping every other entry and the file's shape. Throws if the entry is missing.

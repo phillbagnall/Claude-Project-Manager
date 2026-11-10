@@ -78,14 +78,15 @@ export async function putFile(
   repo: string,
   path: string,
   text: string,
-  sha: string,
+  /** The file's current sha; undefined to create a new file. */
+  sha: string | undefined,
   message: string,
   branch?: string,
 ): Promise<string> {
   const data = await request(token, 'PUT', `${API}/repos/${repo}/contents/${encPath(path)}`, {
     message,
     content: utf8ToB64(text),
-    sha,
+    ...(sha ? { sha } : {}),
     ...(branch ? { branch } : {}),
   });
   return data.content.sha as string;

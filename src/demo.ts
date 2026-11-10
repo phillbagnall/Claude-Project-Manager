@@ -97,3 +97,20 @@ Editing the interview episode. **Blocked:** waiting for guest to approve the cut
 - ${iso(2)}: Rough cut sent to guest
 `,
 };
+
+export const DEMO_IDEAS = `# Ideas
+
+Ideas for future projects, from the dashboard's Ideas tab. Each \`## heading\` is one idea.
+
+## Plant watering reminder
+Added: 2026-11-02
+
+Phone notifications when the garden planner says a bed needs water.
+- Use the weather forecast to skip rainy days
+- Maybe a small sensor later
+
+## Family recipe book (print)
+Added: 2026-11-06
+
+Turn the recipe app's favourites into a printable book for Christmas.
+`;

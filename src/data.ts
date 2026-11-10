@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEMO_FILES, DEMO_REGISTRY } from './demo';
 import type { ColorName } from './colors';
 import { GitHubError, getFile, putFile } from './github';
-import { parseRegistry, projectPath, withColor, type RegistryEntry } from './registry';
+import { parseRegistry, projectPath, withColor, withEntry, type RegistryEntry } from './registry';
 export { projectPath, type RegistryEntry };
 import { addNote as addNoteToText, deleteNote, noteHeadLine, parseNoteHead, parseStatus, replaceNote, setName, setStep, today, type ParsedStatus, type Step } from './status';
 
@@ -311,5 +311,61 @@ export function useProjects(settings: Settings) {
     [editFile],
   );
 
-  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote, deleteNote: removeNote };
+  /**
+   * Create a project whose status file lives in the data repo (projects/<id>.md) and
+   * register it in projects.json. Picks a free id from `baseId`. Resolves to the id.
+   */
+  const createProject = useCallback(
+    async (baseId: string, make: (id: string, path: string) => string): Promise<string> => {
+      const taken = new Set(latest.current.map((p) => p.entry.id));
+      const add = (entry: RegistryEntry, raw: string, sha: string) =>
+        setProjects((ps) => [...ps, { entry, loading: false, raw, sha, pending: {}, status: parseStatus(raw) }]);
+      let n = 1;
+      const nextId = () => (n === 1 ? baseId : `${baseId}-${n}`);
+      if (settings.demo) {
+        while (taken.has(nextId())) n++;
+        const id = nextId();
+        const path = `projects/${id}.md`;
+        add({ id, repo: 'demo/project-tracker-data', path }, make(id, path), 'demo');
+        return id;
+      }
+      try {
+        // Find an id that's free in the registry and as a file name.
+        let id: string, path: string;
+        for (;;) {
+          id = nextId();
+          path = `projects/${id}.md`;
+          n++;
+          if (taken.has(id)) continue;
+          try {
+            await getFile(settings.token, settings.dataRepo, path);
+          } catch (e) {
+            if (e instanceof GitHubError && e.status === 404) break;
+            throw e;
+          }
+        }
+        const text = make(id, path);
+        const sha = await putFile(settings.token, settings.dataRepo, path, text, undefined, `dashboard: new project ${id} (from an idea)`);
+        const entry: RegistryEntry = { id, repo: settings.dataRepo, path };
+        const register = async () => {
+          const reg = await getFile(settings.token, settings.dataRepo, settings.registryPath);
+          await putFile(settings.token, settings.dataRepo, settings.registryPath, withEntry(reg.text, entry), reg.sha, `dashboard: add ${id} to projects.json`);
+        };
+        try {
+          await register();
+        } catch (e) {
+          if (!(e instanceof GitHubError && e.isConflict)) throw e;
+          await register();
+        }
+        add(entry, text, sha);
+        return id;
+      } catch (e) {
+        if (e instanceof GitHubError && e.isAuth) setAuthError(true);
+        throw new Error(`Couldn't create the project: ${errMsg(e)}`);
+      }
+    },
+    [settings],
+  );
+
+  return { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote, deleteNote: removeNote, createProject };
 }

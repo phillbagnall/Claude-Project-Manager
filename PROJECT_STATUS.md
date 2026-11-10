@@ -2,7 +2,7 @@
 name: Claude Project Manager
 phase: Testing
 priority: high
-updated: 2026-11-09
+updated: 2026-11-10
 blocked: false
 links: [https://github.com/phillbagnall/Claude-Project-Manager]
 ---
@@ -151,13 +151,21 @@ Dashboard that shows every Claude project's summary, phase and next steps from `
 - 2026-11-09: Visuals gallery on a phone, with previous/next arrows and counter (test data)
   - Build: collapsible sections, gallery, full width (0ce6319)
   - ![Visuals gallery on a phone](docs/visuals/2026-11-09-gallery-phone.jpg)
+- 2026-11-10: Ideas tab with demo ideas, one opened (demo data)
+  - Build: Ideas tab (see Log)
+  - ![Ideas tab](docs/visuals/2026-11-10-ideas-tab.jpg)
+- 2026-11-10: A promoted idea's kick-off prompt, ready to copy into Claude Code (demo data)
+  - Build: Ideas tab (see Log)
+  - ![Kick-off prompt on a promoted idea](docs/visuals/2026-11-10-kickoff-prompt.jpg)
 
 ## Decisions
+- 2026-11-10: Ideas live in `ideas.md` in the private data repo; promoting creates a data-repo project first, and a Claude Code session moves it into its own repo (the dashboard's token can't create repos)
 - 2026-11-07: Public code + private data repos, so GitHub Pages hosting stays free
 - 2026-11-07: Status file lives in each project's own repo; updates are automatic via CLAUDE.md instruction
 - 2026-11-07: Vite + React + TS static site, no backend
 
 ## Log
+- 2026-11-10: Ideas tab (title + notes, saved as ideas.md in the data repo) with Promote to project, which creates a Planning project and a kick-off prompt for Claude Code
 - 2026-11-09: Did the 2026-11-09 to-do: collapsible project sections (Collapse all / Expand all), gallery navigation in Visuals (arrow keys, swipe, on-screen arrows), full-width layout on desktop, and deleting your own notes
 - 2026-11-09: Softened the Visuals rule (1-3 per visible change, no opening images just to describe them, no back-fill unless asked) to save usage
 - 2026-11-09: Added 15 screenshots from building the dashboard to Visuals

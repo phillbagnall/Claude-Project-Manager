@@ -6,14 +6,19 @@ import { Setup } from './components/Setup';
 import { loadSettings, saveSettings, useProjects, type Project, type Settings } from './data';
 import { PHASES, isBlocked } from './status';
 import { getRawBlob } from './github';
+import { IdeasList } from './components/Ideas';
+import { useIdeas } from './ideasData';
+import { promotedStatus, slugify } from './ideas';
+import { today } from './status';
 import { projectPath } from './data';
 
-type Route = { view: 'overview' } | { view: 'actions' } | { view: 'project'; id: string };
+type Route = { view: 'overview' } | { view: 'actions' } | { view: 'ideas' } | { view: 'project'; id: string };
 type Sort = 'priority' | 'updated' | 'name';
 
 function parseHash(): Route {
   const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
   if (h === 'actions') return { view: 'actions' };
+  if (h === 'ideas') return { view: 'ideas' };
   if (h.startsWith('p/')) return { view: 'project', id: h.slice(2) };
   return { view: 'overview' };
 }
@@ -56,7 +61,8 @@ export function App() {
   const [route, setRoute] = useState<Route>(parseHash);
   const [showSettings, setShowSettings] = useState(false);
   const [prefs, setPrefs] = useState<ViewPrefs>(loadPrefs);
-  const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote, deleteNote } = useProjects(settings);
+  const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote, deleteNote, createProject } = useProjects(settings);
+  const ideas = useIdeas(settings);
 
   useEffect(() => {
     const on = () => {
@@ -109,7 +115,7 @@ export function App() {
       <header className="topbar">
         <Brand />
         <div className="topbar-actions">
-          <button className="icon" onClick={refresh} aria-label="Refresh" title="Refresh" disabled={refreshing}>
+          <button className="icon" onClick={() => { refresh(); ideas.refresh(); }} aria-label="Refresh" title="Refresh" disabled={refreshing}>
             <svg viewBox="0 0 24 24" className={refreshing ? 'spin' : ''}><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" /></svg>
           </button>
           <button className="icon" onClick={() => setShowSettings((v) => !v)} aria-label="Settings" title="Settings">
@@ -137,6 +143,9 @@ export function App() {
             </button>
             <button role="tab" aria-selected={route.view === 'actions'} onClick={() => go('/actions')}>
               Open actions <span className="count">{openCount}</span>
+            </button>
+            <button role="tab" aria-selected={route.view === 'ideas'} onClick={() => go('/ideas')}>
+              Ideas <span className="count">{ideas.ideas.length}</span>
             </button>
             {route.view === 'overview' && (
               <button
@@ -205,6 +214,27 @@ export function App() {
 
         {route.view === 'actions' && (
           <ActionList projects={sortProjects(projects, 'priority')} onOpen={(id) => go(`/p/${encodeURIComponent(id)}`)} onToggle={toggleStep} />
+        )}
+
+        {route.view === 'ideas' && (
+          <IdeasList
+            ideas={ideas.ideas}
+            loading={ideas.loading}
+            error={ideas.error}
+            onAdd={ideas.add}
+            onUpdate={ideas.update}
+            onDelete={(i) => ideas.remove(i)}
+            onPromote={async (idea) => {
+              const dataRepo = settings.demo ? 'demo/project-tracker-data' : settings.dataRepo;
+              const id = await createProject(slugify(idea.title), (id, path) => promotedStatus({ idea, id, dataRepo, path, date: today() }));
+              try {
+                await ideas.remove(idea, 'promote');
+              } catch {
+                /* The project exists; the idea just stays listed until it's deleted. */
+              }
+              go(`/p/${encodeURIComponent(id)}`);
+            }}
+          />
         )}
 
         {route.view === 'project' &&
