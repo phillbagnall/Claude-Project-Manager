@@ -8,6 +8,7 @@ import { PHASES, isBlocked } from './status';
 import { getRawBlob } from './github';
 import { IdeasList } from './components/Ideas';
 import { useIdeas } from './ideasData';
+import { useUpdateCheck } from './version';
 import { promotedStatus, slugify } from './ideas';
 import { today } from './status';
 import { projectPath } from './data';
@@ -63,6 +64,7 @@ export function App() {
   const [prefs, setPrefs] = useState<ViewPrefs>(loadPrefs);
   const { projects, registryError, authError, refreshing, refresh, toggleStep, addNote, setColor, rename, editNote, deleteNote, createProject } = useProjects(settings);
   const ideas = useIdeas(settings);
+  const appUpdate = useUpdateCheck();
 
   useEffect(() => {
     const on = () => {
@@ -115,7 +117,18 @@ export function App() {
       <header className="topbar">
         <Brand />
         <div className="topbar-actions">
-          <button className="icon" onClick={() => { refresh(); ideas.refresh(); }} aria-label="Refresh" title="Refresh" disabled={refreshing}>
+          <button
+            className="icon"
+            onClick={async () => {
+              // A newer dashboard has been deployed: load it (that refreshes the data too).
+              if (await appUpdate.check()) return location.reload();
+              refresh();
+              ideas.refresh();
+            }}
+            aria-label="Refresh"
+            title="Refresh"
+            disabled={refreshing}
+          >
             <svg viewBox="0 0 24 24" className={refreshing ? 'spin' : ''}><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" /></svg>
           </button>
           <button className="icon" onClick={() => setShowSettings((v) => !v)} aria-label="Settings" title="Settings">
@@ -123,6 +136,12 @@ export function App() {
           </button>
         </div>
       </header>
+
+      {appUpdate.updateReady && (
+        <div className="banner update-banner">
+          A new version of the dashboard is ready. <button className="link" onClick={() => location.reload()}>Update now</button>
+        </div>
+      )}
 
       {settings.demo && (
         <div className="banner">
